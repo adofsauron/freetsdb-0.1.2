@@ -1,5 +1,5 @@
 #!/bin/bash
 
-echo `date` nohup freetsd -config ./freetsd.conf > ./logs/freetsd.log &
-nohup freetsd -config ./freetsd.conf > ./logs/freetsd.log &
+echo `date` nohup freetsd -config ./conf/freetsd.conf > ./logs/freetsd.log &
+nohup freetsd -config ./conf/freetsd.conf > ./logs/freetsd.log &
 

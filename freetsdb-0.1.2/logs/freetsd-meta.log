@@ -1,0 +1,9 @@
+ts=2022-02-17T06:18:39.731835Z lvl=info msg="InfluxDB Meta server starting" log_id=0ZiaAGxl000 version=1.8.4 branch=1.8 commit=688e697c51fd
+ts=2022-02-17T06:18:39.731872Z lvl=info msg="Go runtime" log_id=0ZiaAGxl000 version=go1.17 maxprocs=2
+ts=2022-02-17T06:18:39.732424Z lvl=info msg="Starting meta service" log_id=0ZiaAGxl000 service=metaservice
+ts=2022-02-17T06:18:39.732470Z lvl=info msg="Listening on" log_id=0ZiaAGxl000 service=metaservice HTTPS=[::]:8091
+[metastore] 2022/02/17 14:18:39 Using data dir: /root/.freetsdb/meta
+2022-02-17T14:18:39.749+0800 [INFO]  raft-state: bootstrap needed
+2022-02-17T14:18:39.750+0800 [INFO]  raft-state: Node at 192.168.58.128:8089 [Follower]
+2022-02-17T14:18:41.469+0800 [INFO]  raft-state: Node at 192.168.58.128:8089 [Leader]: peers=["192.168.58.128:8089"]
+ts=2022-02-17T06:18:41.551705Z lvl=info msg="Listening for signals" log_id=0ZiaAGxl000

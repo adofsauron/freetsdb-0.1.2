@@ -1,0 +1,162 @@
+ts=2022-02-17T06:18:41.970560Z lvl=info msg="InfluxDB starting" log_id=0ZiaAPhW000 version=1.8.4 branch=1.8 commit=688e697c51fd
+ts=2022-02-17T06:18:41.970619Z lvl=info msg="Go runtime" log_id=0ZiaAPhW000 version=go1.17 maxprocs=2
+ts=2022-02-17T06:18:41.987387Z lvl=info msg="Open Server ready" log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:41.987629Z lvl=info msg="Open Server net.Listen over" log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:41.987687Z lvl=info msg="Open Server mux.Serve over" log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:41.987699Z lvl=info msg="Open Server nodeService over" log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:41.987703Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:42.988519Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:43.990563Z lvl=info msg="Open Server initializeMetaClient over" log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:43.990610Z lvl=info msg="Open Server TSDBStore ready" log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:43.990649Z lvl=info msg=appendHTTPDService log_id=0ZiaAPhW000
+ts=2022-02-17T06:18:43.990862Z lvl=info msg="Using data dir" log_id=0ZiaAPhW000 service=store path=/root/.freetsdb/data
+ts=2022-02-17T06:18:43.990906Z lvl=info msg="Compaction settings" log_id=0ZiaAPhW000 service=store max_concurrent_compactions=1 throughput_bytes_per_second=50331648 throughput_bytes_per_second_burst=50331648
+ts=2022-02-17T06:18:43.990915Z lvl=info msg="Open store (start)" log_id=0ZiaAPhW000 service=store trace_id=0ZiaAXaW000 op_name=tsdb_open op_event=start
+ts=2022-02-17T06:18:43.990966Z lvl=info msg="Skipping database dir" log_id=0ZiaAPhW000 service=store trace_id=0ZiaAXaW000 op_name=tsdb_open name=node.json reason="not a directory"
+ts=2022-02-17T06:18:43.990976Z lvl=info msg="Open store (end)" log_id=0ZiaAPhW000 service=store trace_id=0ZiaAXaW000 op_name=tsdb_open op_event=end op_elapsed=0.061ms
+[handoff] 2022/02/17 14:18:43 Starting hinted handoff service
+ts=2022-02-17T06:18:43.991060Z lvl=info msg="Registered diagnostics client" log_id=0ZiaAPhW000 service=monitor name=hh
+[handoff] 2022/02/17 14:18:43 Using data dir: /root/.freetsdb/hh
+ts=2022-02-17T06:18:43.991177Z lvl=info msg="Opened service" log_id=0ZiaAPhW000 service=subscriber
+ts=2022-02-17T06:18:43.991186Z lvl=info msg="Starting cluster service" log_id=0ZiaAPhW000 service=coordinator
+ts=2022-02-17T06:18:43.991192Z lvl=info msg="Starting monitor service" log_id=0ZiaAPhW000 service=monitor
+ts=2022-02-17T06:18:43.991195Z lvl=info msg="Registered diagnostics client" log_id=0ZiaAPhW000 service=monitor name=build
+ts=2022-02-17T06:18:43.991198Z lvl=info msg="Registered diagnostics client" log_id=0ZiaAPhW000 service=monitor name=runtime
+ts=2022-02-17T06:18:43.991203Z lvl=info msg="Registered diagnostics client" log_id=0ZiaAPhW000 service=monitor name=network
+ts=2022-02-17T06:18:43.991210Z lvl=info msg="Registered diagnostics client" log_id=0ZiaAPhW000 service=monitor name=system
+ts=2022-02-17T06:18:43.991219Z lvl=info msg="Starting precreation service" log_id=0ZiaAPhW000 service=shard-precreation check_interval=10m advance_period=30m
+ts=2022-02-17T06:18:43.991230Z lvl=info msg="Starting snapshot service" log_id=0ZiaAPhW000 service=snapshot
+ts=2022-02-17T06:18:43.991234Z lvl=info msg="Starting copier service" log_id=0ZiaAPhW000 service=copier
+ts=2022-02-17T06:18:43.991239Z lvl=info msg="Starting continuous query service" log_id=0ZiaAPhW000 service=continuous_querier
+ts=2022-02-17T06:18:43.991242Z lvl=info msg="Starting HTTP service" log_id=0ZiaAPhW000 service=httpd authentication=false
+ts=2022-02-17T06:18:43.991245Z lvl=info msg="opened HTTP access log" log_id=0ZiaAPhW000 service=httpd path=stderr
+ts=2022-02-17T06:18:43.991312Z lvl=info msg="Listening on HTTP" log_id=0ZiaAPhW000 service=httpd addr=[::]:8086 https=false
+ts=2022-02-17T06:18:43.991342Z lvl=info msg="Starting retention policy enforcement service" log_id=0ZiaAPhW000 service=retention check_interval=30m
+ts=2022-02-17T06:18:43.991370Z lvl=info msg="Storing statistics" log_id=0ZiaAPhW000 service=monitor db_instance=_internal db_rp=monitor interval=10s
+ts=2022-02-17T06:18:43.991600Z lvl=info msg="Listening for signals" log_id=0ZiaAPhW000
+ts=2022-02-17T06:19:00.011793Z lvl=info msg="tsm1 WAL starting" log_id=0ZiaAPhW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-17T06:19:00.011839Z lvl=info msg="tsm1 WAL writing" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/_internal/monitor/1
+ts=2022-02-17T06:19:00.011876Z lvl=info msg="Reloaded WAL cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/wal/_internal/monitor/1 duration=0.008ms
+ts=2022-02-17T06:19:00.012037Z lvl=info msg="Meta data index for shard loaded" log_id=0ZiaAPhW000 engine=tsm1 id=1 duration=0.124ms
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "GET /ping HTTP/1.1" 204 0 "-" "InfluxDBShell/1.8.10" 86627489-8fb9-11ec-8001-000c29bd2ca7 90
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "GET /ping HTTP/1.1" 204 0 "-" "influxDB importer/" 86629bf5-8fb9-11ec-8002-000c29bd2ca7 41
+ts=2022-02-17T06:19:12.798039Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="CREATE DATABASE NOAA_water_database"
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /query?db=&epoch=s&q=CREATE+DATABASE+NOAA_water_database%0A HTTP/1.1" 200 57 "-" "influxDB importer/" 8662a87a-8fb9-11ec-8003-000c29bd2ca7 3421
+ts=2022-02-17T06:19:12.824086Z lvl=info msg="tsm1 WAL starting" log_id=0ZiaAPhW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-17T06:19:12.824119Z lvl=info msg="tsm1 WAL writing" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/2
+ts=2022-02-17T06:19:12.824163Z lvl=info msg="Reloaded WAL cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/wal/NOAA_water_database/autogen/2 duration=0.011ms
+ts=2022-02-17T06:19:12.824280Z lvl=info msg="Meta data index for shard loaded" log_id=0ZiaAPhW000 engine=tsm1 id=2 duration=0.076ms
+ts=2022-02-17T06:19:12.825915Z lvl=info msg="tsm1 WAL starting" log_id=0ZiaAPhW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-17T06:19:12.825990Z lvl=info msg="tsm1 WAL writing" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/4
+ts=2022-02-17T06:19:12.826040Z lvl=info msg="Reloaded WAL cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/wal/NOAA_water_database/autogen/4 duration=0.008ms
+ts=2022-02-17T06:19:12.826132Z lvl=info msg="Meta data index for shard loaded" log_id=0ZiaAPhW000 engine=tsm1 id=4 duration=0.057ms
+ts=2022-02-17T06:19:12.826371Z lvl=info msg="tsm1 WAL starting" log_id=0ZiaAPhW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-17T06:19:12.826384Z lvl=info msg="tsm1 WAL writing" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/3
+ts=2022-02-17T06:19:12.826427Z lvl=info msg="Reloaded WAL cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/wal/NOAA_water_database/autogen/3 duration=0.008ms
+ts=2022-02-17T06:19:12.826538Z lvl=info msg="Meta data index for shard loaded" log_id=0ZiaAPhW000 engine=tsm1 id=3 duration=0.081ms
+ts=2022-02-17T06:19:12.829628Z lvl=info msg="tsm1 WAL starting" log_id=0ZiaAPhW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-17T06:19:12.829641Z lvl=info msg="tsm1 WAL writing" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/5
+ts=2022-02-17T06:19:12.829673Z lvl=info msg="Reloaded WAL cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/wal/NOAA_water_database/autogen/5 duration=0.007ms
+ts=2022-02-17T06:19:12.829799Z lvl=info msg="Meta data index for shard loaded" log_id=0ZiaAPhW000 engine=tsm1 id=5 duration=0.106ms
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 866444d4-8fb9-11ec-8004-000c29bd2ca7 30864
+ts=2022-02-17T06:19:12.852527Z lvl=info msg="tsm1 WAL starting" log_id=0ZiaAPhW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-17T06:19:12.852568Z lvl=info msg="tsm1 WAL writing" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/7
+ts=2022-02-17T06:19:12.852619Z lvl=info msg="Reloaded WAL cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/wal/NOAA_water_database/autogen/7 duration=0.009ms
+ts=2022-02-17T06:19:12.852791Z lvl=info msg="Meta data index for shard loaded" log_id=0ZiaAPhW000 engine=tsm1 id=7 duration=0.126ms
+ts=2022-02-17T06:19:12.856094Z lvl=info msg="tsm1 WAL starting" log_id=0ZiaAPhW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-17T06:19:12.856181Z lvl=info msg="tsm1 WAL writing" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/6
+ts=2022-02-17T06:19:12.856267Z lvl=info msg="Reloaded WAL cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/wal/NOAA_water_database/autogen/6 duration=0.011ms
+ts=2022-02-17T06:19:12.856422Z lvl=info msg="Meta data index for shard loaded" log_id=0ZiaAPhW000 engine=tsm1 id=6 duration=0.099ms
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 86697e58-8fb9-11ec-8005-000c29bd2ca7 22802
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 866d3b4e-8fb9-11ec-8006-000c29bd2ca7 10787
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 866f481f-8fb9-11ec-8007-000c29bd2ca7 13926
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 86719b32-8fb9-11ec-8008-000c29bd2ca7 13689
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 86741c49-8fb9-11ec-8009-000c29bd2ca7 7428
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 86756c7b-8fb9-11ec-800a-000c29bd2ca7 14039
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 8677b5a9-8fb9-11ec-800b-000c29bd2ca7 11403
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 8679d24b-8fb9-11ec-800c-000c29bd2ca7 6234
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 867aef00-8fb9-11ec-800d-000c29bd2ca7 15166
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 867d6bb1-8fb9-11ec-800e-000c29bd2ca7 14922
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 8680338f-8fb9-11ec-800f-000c29bd2ca7 6875
+[httpd] ::1 - - [17/Feb/2022:14:19:12 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 86816b70-8fb9-11ec-8010-000c29bd2ca7 16029
+[httpd] ::1 - - [17/Feb/2022:14:19:13 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 86840fd9-8fb9-11ec-8011-000c29bd2ca7 9111
+[httpd] ::1 - - [17/Feb/2022:14:19:13 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 8685cc8b-8fb9-11ec-8012-000c29bd2ca7 10782
+[httpd] ::1 - - [17/Feb/2022:14:19:13 +0800] "POST /write?consistency=all&db=NOAA_water_database&precision=s&rp= HTTP/1.1" 204 0 "-" "influxDB importer/" 86878712-8fb9-11ec-8013-000c29bd2ca7 2129
+ts=2022-02-17T06:29:13.825796Z lvl=info msg="Compacting cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/2
+ts=2022-02-17T06:29:13.825899Z lvl=info msg="Cache snapshot (start)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialytG000 op_name=tsm1_cache_snapshot op_event=start
+ts=2022-02-17T06:29:13.826186Z lvl=info msg="Compacting cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/4
+ts=2022-02-17T06:29:13.826221Z lvl=info msg="Cache snapshot (start)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialytW000 op_name=tsm1_cache_snapshot op_event=start
+ts=2022-02-17T06:29:13.826231Z lvl=info msg="Snapshot for path deduplicated" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/2 duration=0.074ms
+ts=2022-02-17T06:29:13.826641Z lvl=info msg="Snapshot for path deduplicated" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/4 duration=0.320ms
+ts=2022-02-17T06:29:13.831366Z lvl=info msg="Compacting cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/3
+ts=2022-02-17T06:29:13.831426Z lvl=info msg="Cache snapshot (start)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialyul000 op_name=tsm1_cache_snapshot op_event=start
+ts=2022-02-17T06:29:13.834584Z lvl=info msg="Removing WAL file" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/2/_00001.wal
+ts=2022-02-17T06:29:13.834742Z lvl=info msg="Snapshot for path written" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialytG000 op_name=tsm1_cache_snapshot path=/root/.freetsdb/data/NOAA_water_database/autogen/2 duration=8.851ms
+ts=2022-02-17T06:29:13.834751Z lvl=info msg="Snapshot for path deduplicated" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/3 duration=3.095ms
+ts=2022-02-17T06:29:13.834763Z lvl=info msg="Compacting cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/5
+ts=2022-02-17T06:29:13.834772Z lvl=info msg="Cache snapshot (start)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialyvW000 op_name=tsm1_cache_snapshot op_event=start
+ts=2022-02-17T06:29:13.835082Z lvl=info msg="Snapshot for path deduplicated" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/5 duration=0.209ms
+ts=2022-02-17T06:29:13.838312Z lvl=info msg="Removing WAL file" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/5/_00001.wal
+ts=2022-02-17T06:29:13.838374Z lvl=info msg="Removing WAL file" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/3/_00001.wal
+ts=2022-02-17T06:29:13.838409Z lvl=info msg="Snapshot for path written" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialyvW000 op_name=tsm1_cache_snapshot path=/root/.freetsdb/data/NOAA_water_database/autogen/5 duration=3.641ms
+ts=2022-02-17T06:29:13.838418Z lvl=info msg="Cache snapshot (end)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialyvW000 op_name=tsm1_cache_snapshot op_event=end op_elapsed=3.649ms
+ts=2022-02-17T06:29:13.834758Z lvl=info msg="Cache snapshot (end)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialytG000 op_name=tsm1_cache_snapshot op_event=end op_elapsed=8.864ms
+ts=2022-02-17T06:29:13.834583Z lvl=info msg="Removing WAL file" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/4/_00001.wal
+ts=2022-02-17T06:29:13.838509Z lvl=info msg="Snapshot for path written" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialyul000 op_name=tsm1_cache_snapshot path=/root/.freetsdb/data/NOAA_water_database/autogen/3 duration=7.089ms
+ts=2022-02-17T06:29:13.838535Z lvl=info msg="Cache snapshot (end)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialyul000 op_name=tsm1_cache_snapshot op_event=end op_elapsed=7.113ms
+ts=2022-02-17T06:29:13.838565Z lvl=info msg="Snapshot for path written" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialytW000 op_name=tsm1_cache_snapshot path=/root/.freetsdb/data/NOAA_water_database/autogen/4 duration=12.351ms
+ts=2022-02-17T06:29:13.838574Z lvl=info msg="Cache snapshot (end)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0ZialytW000 op_name=tsm1_cache_snapshot op_event=end op_elapsed=12.357ms
+ts=2022-02-17T06:29:13.858774Z lvl=info msg="Compacting cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/6
+ts=2022-02-17T06:29:13.858896Z lvl=info msg="Compacting cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/7
+ts=2022-02-17T06:29:13.858904Z lvl=info msg="Cache snapshot (start)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialz0W000 op_name=tsm1_cache_snapshot op_event=start
+ts=2022-02-17T06:29:13.858924Z lvl=info msg="Cache snapshot (start)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialz0W001 op_name=tsm1_cache_snapshot op_event=start
+ts=2022-02-17T06:29:13.859117Z lvl=info msg="Snapshot for path deduplicated" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/7 duration=0.059ms
+ts=2022-02-17T06:29:13.859230Z lvl=info msg="Snapshot for path deduplicated" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/data/NOAA_water_database/autogen/6 duration=0.172ms
+ts=2022-02-17T06:29:13.864433Z lvl=info msg="Removing WAL file" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/6/_00001.wal
+ts=2022-02-17T06:29:13.864512Z lvl=info msg="Removing WAL file" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/NOAA_water_database/autogen/7/_00001.wal
+ts=2022-02-17T06:29:13.864565Z lvl=info msg="Snapshot for path written" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialz0W000 op_name=tsm1_cache_snapshot path=/root/.freetsdb/data/NOAA_water_database/autogen/6 duration=5.676ms
+ts=2022-02-17T06:29:13.864575Z lvl=info msg="Cache snapshot (end)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialz0W000 op_name=tsm1_cache_snapshot op_event=end op_elapsed=5.682ms
+ts=2022-02-17T06:29:13.864576Z lvl=info msg="Snapshot for path written" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialz0W001 op_name=tsm1_cache_snapshot path=/root/.freetsdb/data/NOAA_water_database/autogen/7 duration=5.655ms
+ts=2022-02-17T06:29:13.864582Z lvl=info msg="Cache snapshot (end)" log_id=0ZiaAPhW000 engine=tsm1 trace_id=0Zialz0W001 op_name=tsm1_cache_snapshot op_event=end op_elapsed=5.660ms
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:46:49 +0800] "POST /write?db=test HTTP/1.1" 404 41 "-" "-" 61fbd29a-8fbd-11ec-8014-000c29bd2ca7 83
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:46:54 +0800] "GET /query?db=test&q=SELECT+%2A+from+test+WHERE+host+%3D+%27localhost%27+LIMIT+3 HTTP/1.1" 200 68 "-" "-" 650f68cd-8fbd-11ec-8015-000c29bd2ca7 469
+ts=2022-02-17T06:48:43.993276Z lvl=info msg="Retention policy deletion check (start)" log_id=0ZiaAPhW000 service=retention trace_id=0ZibtOrG000 op_name=retention_delete_check op_event=start
+ts=2022-02-17T06:48:43.993372Z lvl=info msg="Retention policy deletion check (end)" log_id=0ZiaAPhW000 service=retention trace_id=0ZibtOrG000 op_name=retention_delete_check op_event=end op_elapsed=0.131ms
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:48:50 +0800] "POST /write?db=test HTTP/1.1" 404 41 "-" "-" a9b3d30f-8fbd-11ec-8016-000c29bd2ca7 82
+[httpd] ::1 - - [17/Feb/2022:14:49:36 +0800] "GET /ping HTTP/1.1" 204 0 "-" "InfluxDBShell/1.8.10" c58aceca-8fbd-11ec-8017-000c29bd2ca7 58
+ts=2022-02-17T06:49:39.880194Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SHOW DATABASES"
+[httpd] ::1 - - [17/Feb/2022:14:49:39 +0800] "POST /query?chunked=true&db=&epoch=ns&q=show+databases HTTP/1.1" 200 128 "-" "InfluxDBShell/1.8.10" c7694a61-8fbd-11ec-8018-000c29bd2ca7 791
+ts=2022-02-17T06:49:50.705194Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="CREATE DATABASE test"
+[httpd] ::1 - - [17/Feb/2022:14:49:50 +0800] "POST /query?chunked=true&db=&epoch=ns&q=create+database+test HTTP/1.1" 200 57 "-" "InfluxDBShell/1.8.10" cddd051b-8fbd-11ec-8019-000c29bd2ca7 3272
+ts=2022-02-17T06:49:54.626616Z lvl=info msg="tsm1 WAL starting" log_id=0ZiaAPhW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-17T06:49:54.626636Z lvl=info msg="tsm1 WAL writing" log_id=0ZiaAPhW000 engine=tsm1 service=wal path=/root/.freetsdb/wal/test/autogen/8
+ts=2022-02-17T06:49:54.626730Z lvl=info msg="Reloaded WAL cache" log_id=0ZiaAPhW000 engine=tsm1 path=/root/.freetsdb/wal/test/autogen/8 duration=0.033ms
+ts=2022-02-17T06:49:54.627213Z lvl=info msg="Meta data index for shard loaded" log_id=0ZiaAPhW000 engine=tsm1 id=8 duration=0.283ms
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:49:54 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d0329d42-8fbd-11ec-801a-000c29bd2ca7 8680
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:49:54 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d0340197-8fbd-11ec-801b-000c29bd2ca7 872
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:49:54 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d0343194-8fbd-11ec-801c-000c29bd2ca7 829
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:49:54 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d03463a9-8fbd-11ec-801d-000c29bd2ca7 2043
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d60788c3-8fbd-11ec-801e-000c29bd2ca7 1263
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d607c38f-8fbd-11ec-801f-000c29bd2ca7 1869
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d6081d3d-8fbd-11ec-8020-000c29bd2ca7 829
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d6084cf7-8fbd-11ec-8021-000c29bd2ca7 794
+ts=2022-02-17T06:50:04.482461Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SELECT * FROM test.autogen.test WHERE host = 'localhost' LIMIT 3"
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "GET /query?db=test&q=SELECT+%2A+from+test+WHERE+host+%3D+%27localhost%27+LIMIT+3 HTTP/1.1" 200 255 "-" "-" d6134bce-8fbd-11ec-8022-000c29bd2ca7 1123
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" d613e6c2-8fbd-11ec-8023-000c29bd2ca7 3253
+ts=2022-02-17T06:50:04.490304Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SELECT * FROM test.autogen.timestampCheck ORDER BY DESC LIMIT 1"
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "GET /query?db=test&q=SELECT+%2A+from+timestampCheck+ORDER+BY+DESC+LIMIT+1 HTTP/1.1" 200 146 "-" "-" d614806d-8fbd-11ec-8024-000c29bd2ca7 421
+ts=2022-02-17T06:50:04.491728Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SELECT * FROM test.autogen.test WHERE host = 'localhost'"
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "GET /query?db=test&q=SELECT+%2A+from+test+WHERE+host+%3D+%27localhost%27 HTTP/1.1" 200 406 "-" "-" d614b775-8fbd-11ec-8025-000c29bd2ca7 411
+ts=2022-02-17T06:50:04.492818Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SELECT * FROM test.autogen.test1 WHERE host = 'localhost' LIMIT 3"
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "GET /query?db=test&q=SELECT+%2A+from+test1+WHERE+host+%3D+%27localhost%27+LIMIT+3 HTTP/1.1" 200 33 "-" "-" d614e26d-8fbd-11ec-8026-000c29bd2ca7 303
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:04 +0800] "GET /query?db=test&q=SELECT+%2Afrom+test1+WHEREhost+%3D+%27localhost%27+LIMIT+3 HTTP/1.1" 400 80 "-" "-" d61506a6-8fbd-11ec-8027-000c29bd2ca7 143
+ts=2022-02-17T06:50:33.596823Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SELECT * FROM test.autogen.test WHERE host = 'localhost' LIMIT 3"
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:33 +0800] "GET /query?db=test&q=SELECT+%2A+from+test+WHERE+host+%3D+%27localhost%27+LIMIT+3 HTTP/1.1" 200 255 "-" "-" e76dca9e-8fbd-11ec-8028-000c29bd2ca7 545
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:33 +0800] "POST /write?db=test HTTP/1.1" 204 0 "-" "-" e76df831-8fbd-11ec-8029-000c29bd2ca7 1515
+ts=2022-02-17T06:50:33.599798Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SELECT * FROM test.autogen.timestampCheck ORDER BY DESC LIMIT 1"
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:33 +0800] "GET /query?db=test&q=SELECT+%2A+from+timestampCheck+ORDER+BY+DESC+LIMIT+1 HTTP/1.1" 200 146 "-" "-" e76e436f-8fbd-11ec-802a-000c29bd2ca7 294
+ts=2022-02-17T06:50:33.600638Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SELECT * FROM test.autogen.test WHERE host = 'localhost'"
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:33 +0800] "GET /query?db=test&q=SELECT+%2A+from+test+WHERE+host+%3D+%27localhost%27 HTTP/1.1" 200 406 "-" "-" e76e6508-8fbd-11ec-802b-000c29bd2ca7 297
+ts=2022-02-17T06:50:33.601456Z lvl=info msg="Executing query" log_id=0ZiaAPhW000 service=query query="SELECT * FROM test.autogen.test1 WHERE host = 'localhost' LIMIT 3"
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:33 +0800] "GET /query?db=test&q=SELECT+%2A+from+test1+WHERE+host+%3D+%27localhost%27+LIMIT+3 HTTP/1.1" 200 33 "-" "-" e76e8414-8fbd-11ec-802c-000c29bd2ca7 190
+[httpd] 127.0.0.1 - - [17/Feb/2022:14:50:33 +0800] "GET /query?db=test&q=SELECT+%2Afrom+test1+WHEREhost+%3D+%27localhost%27+LIMIT+3 HTTP/1.1" 400 80 "-" "-" e76e9a53-8fbd-11ec-802d-000c29bd2ca7 77

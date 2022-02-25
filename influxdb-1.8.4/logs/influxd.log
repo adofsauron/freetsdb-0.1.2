@@ -1,0 +1,39 @@
+ts=2022-02-25T03:16:50.406824Z lvl=info msg="InfluxDB starting" log_id=0ZsiwvPW000 version=1.8.4 branch=1.8 commit=688e697c51fd
+ts=2022-02-25T03:16:50.406847Z lvl=info msg="Go runtime" log_id=0ZsiwvPW000 version=go1.17 maxprocs=4
+ts=2022-02-25T03:16:50.414821Z lvl=info msg="Open Server ready" log_id=0ZsiwvPW000
+ts=2022-02-25T03:16:50.415004Z lvl=info msg="Open Server net.Listen over" log_id=0ZsiwvPW000
+ts=2022-02-25T03:16:50.415035Z lvl=info msg="Open Server mux.Serve over" log_id=0ZsiwvPW000
+ts=2022-02-25T03:16:50.415042Z lvl=info msg="Open Server nodeService over" log_id=0ZsiwvPW000
+ts=2022-02-25T03:16:50.415044Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0ZsiwvPW000
+ts=2022-02-25T03:16:51.415877Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0ZsiwvPW000
+DEBUG: freetsd:Server:joinCluster, peers = [192.168.58.128:8091] 
+DEBUG: services:meta:client:CreateDataNode, httpAddr = 192.168.58.128:8086, tcpAddr = 192.168.58.128:8088 ID = 2 
+ts=2022-02-25T03:16:52.420710Z lvl=info msg="Open Server initializeMetaClient over" log_id=0ZsiwvPW000
+ts=2022-02-25T03:16:52.420751Z lvl=info msg="Open Server TSDBStore ready" log_id=0ZsiwvPW000
+ts=2022-02-25T03:16:52.420803Z lvl=info msg=appendHTTPDService log_id=0ZsiwvPW000
+ts=2022-02-25T03:16:52.421304Z lvl=info msg="Using data dir" log_id=0ZsiwvPW000 service=store path=/data/influxdb/data
+ts=2022-02-25T03:16:52.421337Z lvl=info msg="Compaction settings" log_id=0ZsiwvPW000 service=store max_concurrent_compactions=2 throughput_bytes_per_second=50331648 throughput_bytes_per_second_burst=50331648
+ts=2022-02-25T03:16:52.421348Z lvl=info msg="Open store (start)" log_id=0ZsiwvPW000 service=store trace_id=0Zsix2HG000 op_name=tsdb_open op_event=start
+ts=2022-02-25T03:16:52.421426Z lvl=info msg="Skipping database dir" log_id=0ZsiwvPW000 service=store trace_id=0Zsix2HG000 op_name=tsdb_open name=node.json reason="not a directory"
+ts=2022-02-25T03:16:52.421435Z lvl=info msg="Open store (end)" log_id=0ZsiwvPW000 service=store trace_id=0Zsix2HG000 op_name=tsdb_open op_event=end op_elapsed=0.088ms
+ts=2022-02-25T03:16:52.421460Z lvl=info msg="Opened service" log_id=0ZsiwvPW000 service=subscriber
+ts=2022-02-25T03:16:52.421466Z lvl=info msg="Starting cluster service" log_id=0ZsiwvPW000 service=coordinator
+ts=2022-02-25T03:16:52.421473Z lvl=info msg="Starting monitor service" log_id=0ZsiwvPW000 service=monitor
+ts=2022-02-25T03:16:52.421478Z lvl=info msg="Registered diagnostics client" log_id=0ZsiwvPW000 service=monitor name=build
+ts=2022-02-25T03:16:52.421482Z lvl=info msg="Registered diagnostics client" log_id=0ZsiwvPW000 service=monitor name=runtime
+ts=2022-02-25T03:16:52.421487Z lvl=info msg="Registered diagnostics client" log_id=0ZsiwvPW000 service=monitor name=network
+ts=2022-02-25T03:16:52.421492Z lvl=info msg="Registered diagnostics client" log_id=0ZsiwvPW000 service=monitor name=system
+ts=2022-02-25T03:16:52.421499Z lvl=info msg="Starting precreation service" log_id=0ZsiwvPW000 service=shard-precreation check_interval=10m advance_period=30m
+ts=2022-02-25T03:16:52.421653Z lvl=info msg="Starting snapshot service" log_id=0ZsiwvPW000 service=snapshot
+ts=2022-02-25T03:16:52.421669Z lvl=info msg="Starting copier service" log_id=0ZsiwvPW000 service=copier
+ts=2022-02-25T03:16:52.421676Z lvl=info msg="Starting continuous query service" log_id=0ZsiwvPW000 service=continuous_querier
+ts=2022-02-25T03:16:52.421702Z lvl=info msg="Starting HTTP service" log_id=0ZsiwvPW000 service=httpd authentication=false
+ts=2022-02-25T03:16:52.421710Z lvl=info msg="opened HTTP access log" log_id=0ZsiwvPW000 service=httpd path=stderr
+ts=2022-02-25T03:16:52.421887Z lvl=info msg="Listening on HTTP" log_id=0ZsiwvPW000 service=httpd addr=[::]:8086 https=false
+ts=2022-02-25T03:16:52.422001Z lvl=info msg="Listening on unix socket" log_id=0ZsiwvPW000 service=httpd addr=/data/influxdb/influxdb.sock
+ts=2022-02-25T03:16:52.422015Z lvl=info msg="Starting retention policy enforcement service" log_id=0ZsiwvPW000 service=retention check_interval=30m
+ts=2022-02-25T03:16:52.422347Z lvl=info msg="Listening for signals" log_id=0ZsiwvPW000
+ts=2022-02-25T03:21:10.035933Z lvl=info msg="tsm1 WAL starting" log_id=0ZsiwvPW000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-02-25T03:21:10.035976Z lvl=info msg="tsm1 WAL writing" log_id=0ZsiwvPW000 engine=tsm1 service=wal path=/data/influxdb/wal/_internal/monitor/2
+ts=2022-02-25T03:21:10.036044Z lvl=info msg="Reloaded WAL cache" log_id=0ZsiwvPW000 engine=tsm1 path=/data/influxdb/wal/_internal/monitor/2 duration=0.014ms
+ts=2022-02-25T03:21:10.036210Z lvl=info msg="Meta data index for shard loaded" log_id=0ZsiwvPW000 engine=tsm1 id=2 duration=0.148ms

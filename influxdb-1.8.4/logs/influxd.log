@@ -1,39 +1,100 @@
-ts=2022-02-25T03:16:50.406824Z lvl=info msg="InfluxDB starting" log_id=0ZsiwvPW000 version=1.8.4 branch=1.8 commit=688e697c51fd
-ts=2022-02-25T03:16:50.406847Z lvl=info msg="Go runtime" log_id=0ZsiwvPW000 version=go1.17 maxprocs=4
-ts=2022-02-25T03:16:50.414821Z lvl=info msg="Open Server ready" log_id=0ZsiwvPW000
-ts=2022-02-25T03:16:50.415004Z lvl=info msg="Open Server net.Listen over" log_id=0ZsiwvPW000
-ts=2022-02-25T03:16:50.415035Z lvl=info msg="Open Server mux.Serve over" log_id=0ZsiwvPW000
-ts=2022-02-25T03:16:50.415042Z lvl=info msg="Open Server nodeService over" log_id=0ZsiwvPW000
-ts=2022-02-25T03:16:50.415044Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0ZsiwvPW000
-ts=2022-02-25T03:16:51.415877Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0ZsiwvPW000
+ts=2022-03-04T10:34:39.784566Z lvl=info msg="InfluxDB starting" log_id=0_17mLA0000 version=1.8.4 branch=1.8 commit=688e697c51fd
+ts=2022-03-04T10:34:39.784632Z lvl=info msg="Go runtime" log_id=0_17mLA0000 version=go1.17 maxprocs=4
+ts=2022-03-04T10:34:39.790989Z lvl=info msg="Open Server ready" log_id=0_17mLA0000
+ts=2022-03-04T10:34:39.791268Z lvl=info msg="Open Server net.Listen over" log_id=0_17mLA0000
+ts=2022-03-04T10:34:39.791320Z lvl=info msg="Open Server mux.Serve over" log_id=0_17mLA0000
+ts=2022-03-04T10:34:39.791333Z lvl=info msg="Open Server nodeService over" log_id=0_17mLA0000
+ts=2022-03-04T10:34:39.791339Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0_17mLA0000
+ts=2022-03-04T10:34:40.792918Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0_17mLA0000
+ts=2022-03-04T10:34:41.793228Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0_17mLA0000
+ts=2022-03-04T10:34:42.794043Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0_17mLA0000
+ts=2022-03-04T10:34:43.794407Z lvl=info msg="s.Node.Peers is nil, wait sleep 1s" log_id=0_17mLA0000
 DEBUG: freetsd:Server:joinCluster, peers = [192.168.58.128:8091] 
 DEBUG: services:meta:client:CreateDataNode, httpAddr = 192.168.58.128:8086, tcpAddr = 192.168.58.128:8088 ID = 2 
-ts=2022-02-25T03:16:52.420710Z lvl=info msg="Open Server initializeMetaClient over" log_id=0ZsiwvPW000
-ts=2022-02-25T03:16:52.420751Z lvl=info msg="Open Server TSDBStore ready" log_id=0ZsiwvPW000
-ts=2022-02-25T03:16:52.420803Z lvl=info msg=appendHTTPDService log_id=0ZsiwvPW000
-ts=2022-02-25T03:16:52.421304Z lvl=info msg="Using data dir" log_id=0ZsiwvPW000 service=store path=/data/influxdb/data
-ts=2022-02-25T03:16:52.421337Z lvl=info msg="Compaction settings" log_id=0ZsiwvPW000 service=store max_concurrent_compactions=2 throughput_bytes_per_second=50331648 throughput_bytes_per_second_burst=50331648
-ts=2022-02-25T03:16:52.421348Z lvl=info msg="Open store (start)" log_id=0ZsiwvPW000 service=store trace_id=0Zsix2HG000 op_name=tsdb_open op_event=start
-ts=2022-02-25T03:16:52.421426Z lvl=info msg="Skipping database dir" log_id=0ZsiwvPW000 service=store trace_id=0Zsix2HG000 op_name=tsdb_open name=node.json reason="not a directory"
-ts=2022-02-25T03:16:52.421435Z lvl=info msg="Open store (end)" log_id=0ZsiwvPW000 service=store trace_id=0Zsix2HG000 op_name=tsdb_open op_event=end op_elapsed=0.088ms
-ts=2022-02-25T03:16:52.421460Z lvl=info msg="Opened service" log_id=0ZsiwvPW000 service=subscriber
-ts=2022-02-25T03:16:52.421466Z lvl=info msg="Starting cluster service" log_id=0ZsiwvPW000 service=coordinator
-ts=2022-02-25T03:16:52.421473Z lvl=info msg="Starting monitor service" log_id=0ZsiwvPW000 service=monitor
-ts=2022-02-25T03:16:52.421478Z lvl=info msg="Registered diagnostics client" log_id=0ZsiwvPW000 service=monitor name=build
-ts=2022-02-25T03:16:52.421482Z lvl=info msg="Registered diagnostics client" log_id=0ZsiwvPW000 service=monitor name=runtime
-ts=2022-02-25T03:16:52.421487Z lvl=info msg="Registered diagnostics client" log_id=0ZsiwvPW000 service=monitor name=network
-ts=2022-02-25T03:16:52.421492Z lvl=info msg="Registered diagnostics client" log_id=0ZsiwvPW000 service=monitor name=system
-ts=2022-02-25T03:16:52.421499Z lvl=info msg="Starting precreation service" log_id=0ZsiwvPW000 service=shard-precreation check_interval=10m advance_period=30m
-ts=2022-02-25T03:16:52.421653Z lvl=info msg="Starting snapshot service" log_id=0ZsiwvPW000 service=snapshot
-ts=2022-02-25T03:16:52.421669Z lvl=info msg="Starting copier service" log_id=0ZsiwvPW000 service=copier
-ts=2022-02-25T03:16:52.421676Z lvl=info msg="Starting continuous query service" log_id=0ZsiwvPW000 service=continuous_querier
-ts=2022-02-25T03:16:52.421702Z lvl=info msg="Starting HTTP service" log_id=0ZsiwvPW000 service=httpd authentication=false
-ts=2022-02-25T03:16:52.421710Z lvl=info msg="opened HTTP access log" log_id=0ZsiwvPW000 service=httpd path=stderr
-ts=2022-02-25T03:16:52.421887Z lvl=info msg="Listening on HTTP" log_id=0ZsiwvPW000 service=httpd addr=[::]:8086 https=false
-ts=2022-02-25T03:16:52.422001Z lvl=info msg="Listening on unix socket" log_id=0ZsiwvPW000 service=httpd addr=/data/influxdb/influxdb.sock
-ts=2022-02-25T03:16:52.422015Z lvl=info msg="Starting retention policy enforcement service" log_id=0ZsiwvPW000 service=retention check_interval=30m
-ts=2022-02-25T03:16:52.422347Z lvl=info msg="Listening for signals" log_id=0ZsiwvPW000
-ts=2022-02-25T03:21:10.035933Z lvl=info msg="tsm1 WAL starting" log_id=0ZsiwvPW000 engine=tsm1 service=wal segment_size=10485760
-ts=2022-02-25T03:21:10.035976Z lvl=info msg="tsm1 WAL writing" log_id=0ZsiwvPW000 engine=tsm1 service=wal path=/data/influxdb/wal/_internal/monitor/2
-ts=2022-02-25T03:21:10.036044Z lvl=info msg="Reloaded WAL cache" log_id=0ZsiwvPW000 engine=tsm1 path=/data/influxdb/wal/_internal/monitor/2 duration=0.014ms
-ts=2022-02-25T03:21:10.036210Z lvl=info msg="Meta data index for shard loaded" log_id=0ZsiwvPW000 engine=tsm1 id=2 duration=0.148ms
+ts=2022-03-04T10:34:44.796692Z lvl=info msg="Open Server initializeMetaClient over" log_id=0_17mLA0000
+ts=2022-03-04T10:34:44.796740Z lvl=info msg="Open Server TSDBStore ready" log_id=0_17mLA0000
+ts=2022-03-04T10:34:44.796781Z lvl=info msg=appendHTTPDService log_id=0_17mLA0000
+ts=2022-03-04T10:34:44.796996Z lvl=info msg="Using data dir" log_id=0_17mLA0000 service=store path=/data/influxdb/data
+ts=2022-03-04T10:34:44.797029Z lvl=info msg="Compaction settings" log_id=0_17mLA0000 service=store max_concurrent_compactions=2 throughput_bytes_per_second=50331648 throughput_bytes_per_second_burst=50331648
+ts=2022-03-04T10:34:44.797040Z lvl=info msg="Open store (start)" log_id=0_17mLA0000 service=store trace_id=0_17mdkG000 op_name=tsdb_open op_event=start
+ts=2022-03-04T10:34:44.801027Z lvl=info msg="Skipping database dir" log_id=0_17mLA0000 service=store trace_id=0_17mdkG000 op_name=tsdb_open name=node.json reason="not a directory"
+ts=2022-03-04T10:34:44.801046Z lvl=info msg="Open store (end)" log_id=0_17mLA0000 service=store trace_id=0_17mdkG000 op_name=tsdb_open op_event=end op_elapsed=4.007ms
+ts=2022-03-04T10:34:44.801102Z lvl=info msg="Opened service" log_id=0_17mLA0000 service=subscriber
+ts=2022-03-04T10:34:44.801115Z lvl=info msg="Starting cluster service" log_id=0_17mLA0000 service=coordinator
+ts=2022-03-04T10:34:44.801130Z lvl=info msg="Starting monitor service" log_id=0_17mLA0000 service=monitor
+ts=2022-03-04T10:34:44.801136Z lvl=info msg="Registered diagnostics client" log_id=0_17mLA0000 service=monitor name=build
+ts=2022-03-04T10:34:44.801143Z lvl=info msg="Registered diagnostics client" log_id=0_17mLA0000 service=monitor name=runtime
+ts=2022-03-04T10:34:44.801148Z lvl=info msg="Registered diagnostics client" log_id=0_17mLA0000 service=monitor name=network
+ts=2022-03-04T10:34:44.801153Z lvl=info msg="Registered diagnostics client" log_id=0_17mLA0000 service=monitor name=system
+ts=2022-03-04T10:34:44.801161Z lvl=info msg="Starting precreation service" log_id=0_17mLA0000 service=shard-precreation check_interval=10m advance_period=30m
+ts=2022-03-04T10:34:44.801170Z lvl=info msg="Starting snapshot service" log_id=0_17mLA0000 service=snapshot
+ts=2022-03-04T10:34:44.801182Z lvl=info msg="Starting copier service" log_id=0_17mLA0000 service=copier
+ts=2022-03-04T10:34:44.801190Z lvl=info msg="Starting continuous query service" log_id=0_17mLA0000 service=continuous_querier
+ts=2022-03-04T10:34:44.801210Z lvl=info msg="Starting HTTP service" log_id=0_17mLA0000 service=httpd authentication=false
+ts=2022-03-04T10:34:44.801214Z lvl=info msg="opened HTTP access log" log_id=0_17mLA0000 service=httpd path=stderr
+ts=2022-03-04T10:34:44.801315Z lvl=info msg="Listening on HTTP" log_id=0_17mLA0000 service=httpd addr=[::]:8086 https=false
+ts=2022-03-04T10:34:44.801367Z lvl=info msg="Listening on unix socket" log_id=0_17mLA0000 service=httpd addr=/data/influxdb/influxdb.sock
+ts=2022-03-04T10:34:44.801380Z lvl=info msg="Starting retention policy enforcement service" log_id=0_17mLA0000 service=retention check_interval=30m
+ts=2022-03-04T10:34:44.801385Z lvl=info msg="Starting haraft service" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:44.801559Z lvl=info msg="haraft serve haRaftAddr: 192.168.58.128:50051" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:44.801594Z lvl=info msg="haraft serve haRaftDir: /data/influxdb/data/haraft" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:44.801601Z lvl=info msg="haraft serve haRaftId: 192.168.58.128:50051" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:44.801599Z lvl=info msg="Listening for signals" log_id=0_17mLA0000
+2022-03-04T18:34:44.806+0800 [INFO]  raft: initial configuration: index=0 servers=[]
+2022-03-04T18:34:44.806+0800 [INFO]  raft: entering follower state: follower="Node at 192.168.58.128:50051 [Follower]" leader=
+2022-03-04T18:34:46.224+0800 [WARN]  raft: heartbeat timeout reached, starting election: last-leader=
+2022-03-04T18:34:46.225+0800 [INFO]  raft: entering candidate state: node="Node at 192.168.58.128:50051 [Candidate]" term=2
+2022-03-04T18:34:46.226+0800 [DEBUG] raft: votes: needed=1
+2022-03-04T18:34:46.226+0800 [DEBUG] raft: vote granted: from=192.168.58.128:50051 term=2 tally=1
+2022-03-04T18:34:46.226+0800 [INFO]  raft: election won: tally=1
+2022-03-04T18:34:46.226+0800 [INFO]  raft: entering leader state: leader="Node at 192.168.58.128:50051 [Leader]"
+ts=2022-03-04T10:34:47.453732Z lvl=info msg="MarshalQuery RT index : 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453783Z lvl=info msg="MarshalQuery qr len index : 8, qrLen: 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453787Z lvl=info msg="MarshalQuery uid len index : 16, uidLen: 3" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453791Z lvl=info msg="MarshalQuery database len index : 27, databaseLen: 4" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453795Z lvl=info msg="MarshalQuery retentionPolicy len index : 39, retentionPolicyLen: 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453799Z lvl=info msg="MarshalQuery chunkSize len index : 47" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453803Z lvl=info msg="MarshalQuery nodeID len index : 55" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453806Z lvl=info msg="MarshalQuery readOnly len index : 63, readOnlyLen: 5" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453810Z lvl=info msg="MarshalQuery over index : 71" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453815Z lvl=info msg="haraft ServeQuery, I'am leader: 192.168.58.128:50051" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:47.453837Z lvl=info msg="Executing query" log_id=0_17mLA0000 service=query query="CREATE DATABASE test"
+ts=2022-03-04T10:34:47.454779Z lvl=info msg="wordTracker Apply, rf_type: 2 " log_id=0_17mLA0000 service=haraft
+[httpd] ::1 - - [04/Mar/2022:18:34:47 +0800] "POST /query?chunked=true&db=test&epoch=ns&q=create+database+test HTTP/1.1" 200 57 "-" "InfluxDBShell/1.8.4" b6bfb106-9ba6-11ec-8001-000c29bd2ca7 7392
+ts=2022-03-04T10:34:50.168119Z lvl=info msg="Executing query" log_id=0_17mLA0000 service=query query="SHOW DATABASES"
+[httpd] ::1 - - [04/Mar/2022:18:34:50 +0800] "POST /query?db=&epoch=ns&q=SHOW+DATABASES HTTP/1.1" 200 106 "-" "InfluxDBShell/1.8.4" b85dd3da-9ba6-11ec-8002-000c29bd2ca7 823
+ts=2022-03-04T10:34:50.168480Z lvl=info msg="MarshalQuery RT index : 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168494Z lvl=info msg="MarshalQuery qr len index : 8, qrLen: 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168499Z lvl=info msg="MarshalQuery uid len index : 16, uidLen: 3" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168503Z lvl=info msg="MarshalQuery database len index : 27, databaseLen: 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168508Z lvl=info msg="MarshalQuery retentionPolicy len index : 35, retentionPolicyLen: 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168521Z lvl=info msg="MarshalQuery chunkSize len index : 43" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168526Z lvl=info msg="MarshalQuery nodeID len index : 51" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168532Z lvl=info msg="MarshalQuery readOnly len index : 59, readOnlyLen: 5" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168538Z lvl=info msg="MarshalQuery over index : 67" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.168546Z lvl=info msg="haraft ServeQuery, I'am leader: 192.168.58.128:50051" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:50.170045Z lvl=info msg="wordTracker Apply, rf_type: 2 " log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:53.330936Z lvl=info msg="PointsWriter::WritePointsPrivilegedHaRaft database = test, retentionPolicy = , consistencyLevel = 3" log_id=0_17mLA0000 service=write
+ts=2022-03-04T10:34:53.330998Z lvl=info msg="haraft WritePointsPrivileged Apply, I'am leader: 192.168.58.128:50051" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:53.332377Z lvl=info msg="wordTracker Apply, rf_type: 1 " log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:53.332420Z lvl=info msg="PointsWriter::WritePointsPrivilegedApply database = test, retentionPolicy = , consistencyLevel = 3" log_id=0_17mLA0000 service=write
+ts=2022-03-04T10:34:53.339758Z lvl=info msg="tsm1 WAL starting" log_id=0_17mLA0000 engine=tsm1 service=wal segment_size=10485760
+ts=2022-03-04T10:34:53.339788Z lvl=info msg="tsm1 WAL writing" log_id=0_17mLA0000 engine=tsm1 service=wal path=/data/influxdb/wal/test/autogen/1
+ts=2022-03-04T10:34:53.339840Z lvl=info msg="Reloaded WAL cache" log_id=0_17mLA0000 engine=tsm1 path=/data/influxdb/wal/test/autogen/1 duration=0.010ms
+ts=2022-03-04T10:34:53.339919Z lvl=info msg="Meta data index for shard loaded" log_id=0_17mLA0000 engine=tsm1 id=1 duration=0.064ms
+ts=2022-03-04T10:34:53.342081Z lvl=info msg="wordTracker ApplyWritePoint ok, database: test, consistencyLevel: 3 " log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:53.342146Z lvl=info msg="haraft WritePointsPrivileged Apply ok, database: test, retentionPolicy: " log_id=0_17mLA0000 service=haraft
+[httpd] ::1 - - [04/Mar/2022:18:34:53 +0800] "POST /write?consistency=all&db=test&precision=ns&rp= HTTP/1.1" 204 0 "-" "InfluxDBShell/1.8.4" ba407f7d-9ba6-11ec-8003-000c29bd2ca7 11379
+ts=2022-03-04T10:34:55.388804Z lvl=info msg="MarshalQuery RT index : 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388853Z lvl=info msg="MarshalQuery qr len index : 8, qrLen: 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388859Z lvl=info msg="MarshalQuery uid len index : 16, uidLen: 3" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388865Z lvl=info msg="MarshalQuery database len index : 27, databaseLen: 4" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388871Z lvl=info msg="MarshalQuery retentionPolicy len index : 39, retentionPolicyLen: 0" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388877Z lvl=info msg="MarshalQuery chunkSize len index : 47" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388882Z lvl=info msg="MarshalQuery nodeID len index : 55" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388888Z lvl=info msg="MarshalQuery readOnly len index : 63, readOnlyLen: 5" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388895Z lvl=info msg="MarshalQuery over index : 71" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.388903Z lvl=info msg="haraft ServeQuery, I'am leader: 192.168.58.128:50051" log_id=0_17mLA0000 service=haraft
+ts=2022-03-04T10:34:55.389052Z lvl=info msg="Executing query" log_id=0_17mLA0000 service=query query="SELECT * FROM test.autogen.cpu"
+[httpd] ::1 - - [04/Mar/2022:18:34:55 +0800] "POST /query?chunked=true&db=test&epoch=ns&q=select+%2A+from+cpu HTTP/1.1" 200 123 "-" "InfluxDBShell/1.8.4" bb7a7ca4-9ba6-11ec-8004-000c29bd2ca7 1353
+ts=2022-03-04T10:34:55.390451Z lvl=info msg="wordTracker Apply, rf_type: 2 " log_id=0_17mLA0000 service=haraft

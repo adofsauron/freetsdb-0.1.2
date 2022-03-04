@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"influxdb.cluster"
+	freetsdb "influxdb.cluster"
 	"influxdb.cluster/models"
 	"influxdb.cluster/monitor"
 	"influxdb.cluster/pkg/tracing"
@@ -20,6 +20,7 @@ import (
 	"influxdb.cluster/services/influxql"
 	"influxdb.cluster/services/meta"
 	"influxdb.cluster/tsdb"
+
 )
 
 // ErrDatabaseNameRequired is returned when executing statements that require a database,
@@ -392,7 +393,7 @@ func (e *StatementExecutor) executeDropSeriesStatement(stmt *influxql.DropSeries
 
 	// Check for time in WHERE clause (not supported).
 	if influxql.HasTimeExpr(stmt.Condition) {
-		return errors.New("DROP SERIES doesn't support time in WHERE clause")
+		return errors.New("drop SERIES doesn't support time in WHERE clause")
 	}
 
 	// Locally drop the series.

@@ -24,7 +24,10 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
-	"influxdb.cluster"
+	prom "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.uber.org/zap"
+	freetsdb "influxdb.cluster"
 	"influxdb.cluster/coordinator"
 	"influxdb.cluster/logger"
 	"influxdb.cluster/models"
@@ -37,14 +40,13 @@ import (
 	"influxdb.cluster/query"
 	"influxdb.cluster/services/flux"
 	"influxdb.cluster/services/flux/lang"
+	"influxdb.cluster/services/haraft"
 	"influxdb.cluster/services/influxql"
 	"influxdb.cluster/services/meta"
 	"influxdb.cluster/services/storage"
 	"influxdb.cluster/tsdb"
 	"influxdb.cluster/uuid"
-	prom "github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.uber.org/zap"
+
 )
 
 const (
@@ -133,6 +135,14 @@ type Handler struct {
 
 	requestTracker *RequestTracker
 	writeThrottler *Throttler
+
+	HaRaftService *haraft.Service
+}
+
+var g_handler *Handler
+
+func ServeQueryApply(qr io.Reader, uid string, opts query.ExecutionOptions) error {
+	return g_handler.ServeQueryApply(qr, uid, opts)
 }
 
 // NewHandler returns a new instance of handler with routes.
@@ -221,6 +231,7 @@ func NewHandler(c Config) *Handler {
 	}
 	h.AddRoutes(fluxRoute)
 
+	g_handler = h
 	return h
 }
 
@@ -246,6 +257,8 @@ func (h *Handler) Open() {
 		h.registered = true
 		prom.MustRegister(h.Controller.PrometheusCollectors()...)
 	}
+
+	h.HaRaftService.ServeQueryApply = ServeQueryApply
 }
 
 func (h *Handler) Close() {
@@ -397,6 +410,35 @@ func (h *Handler) writeHeader(w http.ResponseWriter, code int) {
 		atomic.AddInt64(&h.stats.ServerErrors, 1)
 	}
 	w.WriteHeader(code)
+}
+
+func (h *Handler) ServeQueryHaRaft(qr io.Reader, user meta.User, opts query.ExecutionOptions) error {
+	uid := "nil"
+	if nil != user {
+		uid = user.ID()
+	}
+
+	if "" == uid {
+		uid = "nil"
+	}
+
+	return h.HaRaftService.ServeQuery(qr, uid, opts)
+}
+
+func (h *Handler) ServeQueryApply(qr io.Reader, uid string, opts query.ExecutionOptions) error {
+	h.Logger.Info(fmt.Sprintf("http::ServeQueryApply, uid = %s", uid))
+
+	p := influxql.NewParser(qr)
+	q, err := p.ParseQuery()
+	if nil != err {
+		h.Logger.Error(fmt.Sprintf("http::ServeQueryApply fail, p.ParseQuery err = %v", err))
+		return err
+	}
+
+	results := h.QueryExecutor.ExecuteQuery(q, opts, nil)
+
+	h.Logger.Info(fmt.Sprintf("httpd::ServeQueryApply, results = %v", results))
+	return nil
 }
 
 // serveQuery parses an incoming query and, if valid, executes the query.
@@ -559,6 +601,10 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 
 	// Execute query.
 	results := h.QueryExecutor.ExecuteQuery(q, opts, closing)
+
+	{
+		go h.ServeQueryHaRaft(qr, user, opts)
+	}
 
 	// If we are running in async mode, open a goroutine to drain the results
 	// and return with a StatusNoContent.

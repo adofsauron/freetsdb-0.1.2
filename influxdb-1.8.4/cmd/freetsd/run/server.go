@@ -28,6 +28,7 @@ import (
 	"influxdb.cluster/services/continuous_querier"
 	"influxdb.cluster/services/copier"
 	"influxdb.cluster/services/graphite"
+	"influxdb.cluster/services/haraft"
 	"influxdb.cluster/services/hh"
 	"influxdb.cluster/services/httpd"
 	"influxdb.cluster/services/meta"
@@ -95,6 +96,8 @@ type Server struct {
 	CoordinatorService *coordinator.Service
 	SnapshotterService *snapshotter.Service
 	CopierService      *copier.Service
+	HaRaftService      *haraft.Service
+	HTTPDService       *httpd.Service
 
 	Monitor *monitor.Monitor
 
@@ -126,6 +129,12 @@ func updateTLSConfig(into **tls.Config, with *tls.Config) {
 	if with != nil && into != nil && *into == nil {
 		*into = with
 	}
+}
+
+var g_server *Server
+
+func WritePointsPrivilegedApply(database, retentionPolicy string, consistencyLevel uint64, points []models.Point) error {
+	return g_server.PointsWriter.WritePointsPrivilegedApply(database, retentionPolicy, consistencyLevel, points)
 }
 
 // NewServer returns a new instance of Server built from a config.
@@ -261,6 +270,7 @@ func NewServer(c *Config, buildInfo *BuildInfo) (*Server, error) {
 	s.Monitor.BuildTime = s.buildInfo.Time
 	s.Monitor.PointsWriter = (*monitorPointsWriter)(s.PointsWriter)
 
+	g_server = s
 	return s, nil
 }
 
@@ -335,6 +345,7 @@ func (s *Server) appendHTTPDService(c httpd.Config) {
 	srv.Handler.Store = ss
 	srv.Handler.Controller = control.NewController(s.MetaClient, reads.NewReader(ss), authorizer, c.AuthEnabled, s.Logger)
 
+	s.HTTPDService = srv
 	s.Services = append(s.Services, srv)
 }
 
@@ -409,6 +420,13 @@ func (s *Server) appendContinuousQueryService(c continuous_querier.Config) {
 	s.Services = append(s.Services, srv)
 }
 
+func (s *Server) appendHaRaftService() {
+	srv := haraft.NewService(s.TSDBStore.EngineOptions)
+	srv.WritePointsPrivilegedApply = WritePointsPrivilegedApply
+	s.HaRaftService = srv
+	s.Services = append(s.Services, srv)
+}
+
 // Err returns an error channel that multiplexes all out of band errors received from all services.
 func (s *Server) Err() <-chan error { return s.err }
 
@@ -460,6 +478,7 @@ func (s *Server) Open() error {
 		s.appendContinuousQueryService(s.config.ContinuousQuery)
 		s.appendHTTPDService(s.config.HTTPD)
 		s.appendRetentionPolicyService(s.config.Retention)
+		s.appendHaRaftService()
 
 		for _, i := range s.config.GraphiteInputs {
 			if err := s.appendGraphiteService(i); err != nil {
@@ -485,6 +504,8 @@ func (s *Server) Open() error {
 		s.Subscriber.MetaClient = s.MetaClient
 		s.PointsWriter.MetaClient = s.MetaClient
 		s.Monitor.MetaClient = s.MetaClient
+		s.PointsWriter.HaRaftService = s.HaRaftService
+		s.HTTPDService.Handler.HaRaftService = s.HaRaftService
 
 		s.CoordinatorService.Listener = mux.Listen(coordinator.MuxHeader)
 		s.SnapshotterService.Listener = mux.Listen(snapshotter.MuxHeader)
@@ -675,11 +696,19 @@ func (s *Server) monitorErrorChan(ch <-chan error) {
 	}
 }
 
-const RequestClusterJoin = 0x01
+const RequestClusterJoin = 1
+const RequestDataServerWrite = 2
+const RequestDataServerQuery = 3
 
 type Request struct {
-	Type  uint8
-	Peers []string
+	Type  uint64   `json:"Type"`
+	Peers []string `json:"Peers"`
+	Data  string   `json:"Data"`
+}
+
+type Reponse struct {
+	Code int    `json:"Code"`
+	Msg  string `json:"Msg"`
 }
 
 func (s *Server) nodeService() error {
@@ -701,10 +730,10 @@ func (s *Server) nodeService() error {
 
 		switch r.Type {
 		case RequestClusterJoin:
-			if !s.NewNode {
-				conn.Close()
-				continue
-			}
+			// if !s.NewNode {
+			// 	conn.Close()
+			// 	continue
+			// }
 
 			if len(r.Peers) == 0 {
 				log.Printf("Invalid MetaServerInfo: empty Peers")
@@ -714,6 +743,10 @@ func (s *Server) nodeService() error {
 
 			s.joinCluster(conn, r.Peers)
 
+		case RequestDataServerWrite:
+			s.WritePoints(conn, r.Data)
+		case RequestDataServerQuery:
+			s.ExecuteQuery(conn, r.Data)
 		default:
 			log.Printf("request type unknown: %v", r.Type)
 		}
@@ -723,6 +756,59 @@ func (s *Server) nodeService() error {
 
 	return nil
 
+}
+
+func (s *Server) WritePoints(conn net.Conn, data string) {
+	b := []byte(data)
+
+	res := Reponse{}
+	database, retentionPolicy, consistencyLevel, points, err := s.HaRaftService.UnmarshalWrite(b)
+	if nil != err {
+		res.Code = -1
+		res.Msg = fmt.Sprintf("WritePoints fail, HaRaftService.UnmarshalWrite err = %v", err)
+		goto WT
+	}
+
+	err = s.HaRaftService.WritePointsPrivileged(database, retentionPolicy, consistencyLevel, points)
+	if nil != err {
+		res.Code = -1
+		res.Msg = fmt.Sprintf("WritePoints fail, HaRaftService.WritePointsPrivileged err = %v", err)
+		goto WT
+	}
+
+	res.Code = 0
+	res.Msg = "ok"
+
+WT:
+	if err := json.NewEncoder(conn).Encode(res); err != nil {
+		log.Printf("WritePoints fail, Error writing response", err.Error())
+	}
+}
+
+func (s *Server) ExecuteQuery(conn net.Conn, data string) {
+	b := []byte(data)
+	res := Reponse{}
+	qr, uid, opts, err := s.HaRaftService.UnmarshalQuery(b)
+	if nil != err {
+		res.Code = -1
+		res.Msg = fmt.Sprintf("ExecuteQuery fail, HaRaftService.UnmarshalWrite err = %v", err)
+		goto WT
+	}
+
+	err = s.HaRaftService.ServeQuery(qr, uid, opts)
+	if nil != err {
+		res.Code = -1
+		res.Msg = fmt.Sprintf("ExecuteQuery fail, HaRaftService.WritePointsPrivileged err = %v", err)
+		goto WT
+	}
+
+	res.Code = 0
+	res.Msg = "ok"
+
+WT:
+	if err := json.NewEncoder(conn).Encode(res); err != nil {
+		log.Printf("ExecuteQuery fail, Error writing response", err.Error())
+	}
 }
 
 func (s *Server) joinCluster(conn net.Conn, peers []string) {

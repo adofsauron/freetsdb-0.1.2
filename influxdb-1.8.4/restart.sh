@@ -8,13 +8,16 @@ sleep 2s
 
 echo -e "\n"
 
-# echo `date` rm /data/influxdb -rf
-# rm /data/influxdb -rf
+echo `date` rm /data/influxdb -rf
+rm /data/influxdb -rf
 
-# echo `date` sleep 2s
-# sleep 2s
+echo `date` mkdir -p /data/influxdb/data/haraft
+mkdir -p /data/influxdb/data/haraft
 
-# echo -e "\n"
+echo `date` sleep 2s
+sleep 2s
+
+echo -e "\n"
 
 echo `date` bash ./run-meta.sh
 bash ./run-meta.sh

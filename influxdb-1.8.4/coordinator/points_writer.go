@@ -9,11 +9,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"influxdb.cluster"
+	"go.uber.org/zap"
+	freetsdb "influxdb.cluster"
 	"influxdb.cluster/models"
+	"influxdb.cluster/services/haraft"
 	"influxdb.cluster/services/meta"
 	"influxdb.cluster/tsdb"
-	"go.uber.org/zap"
+
 )
 
 // ConsistencyLevel represent a required replication criteria before a write can
@@ -89,7 +91,8 @@ type PointsWriter struct {
 	WriteTimeout time.Duration
 	Logger       *zap.Logger
 
-	Node *freetsdb.Node
+	Node          *freetsdb.Node
+	HaRaftService *haraft.Service
 
 	MetaClient interface {
 		Database(name string) (di *meta.DatabaseInfo)
@@ -326,7 +329,22 @@ func (w *PointsWriter) WritePointsInto(p *IntoWriteRequest) error {
 
 // WritePoints writes the data to the underlying storage. consitencyLevel and user are only used for clustered scenarios
 func (w *PointsWriter) WritePoints(database, retentionPolicy string, consistencyLevel ConsistencyLevel, user meta.User, points []models.Point) error {
-	return w.WritePointsPrivileged(database, retentionPolicy, consistencyLevel, points)
+	// return w.WritePointsPrivileged(database, retentionPolicy, consistencyLevel, points)
+	return w.WritePointsPrivilegedHaRaft(database, retentionPolicy, consistencyLevel, points)
+}
+
+func (w *PointsWriter) WritePointsPrivilegedHaRaft(database, retentionPolicy string, consistencyLevel ConsistencyLevel, points []models.Point) error {
+	w.Logger.Info(fmt.Sprintf("PointsWriter::WritePointsPrivilegedHaRaft database = %s, retentionPolicy = %s, consistencyLevel = %d",
+		database, retentionPolicy, consistencyLevel))
+
+	return w.HaRaftService.WritePointsPrivileged(database, retentionPolicy, uint64(consistencyLevel), points)
+}
+
+func (w *PointsWriter) WritePointsPrivilegedApply(database, retentionPolicy string, consistencyLevel uint64, points []models.Point) error {
+	w.Logger.Info(fmt.Sprintf("PointsWriter::WritePointsPrivilegedApply database = %s, retentionPolicy = %s, consistencyLevel = %d",
+		database, retentionPolicy, consistencyLevel))
+	
+	return w.WritePointsPrivileged(database, retentionPolicy, ConsistencyLevel(consistencyLevel), points) 
 }
 
 // WritePointsPrivileged writes the data to the underlying storage, consitencyLevel is only used for clustered scenarios

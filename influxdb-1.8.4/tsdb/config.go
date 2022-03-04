@@ -7,6 +7,7 @@ import (
 
 	"influxdb.cluster/monitor/diagnostics"
 	"influxdb.cluster/toml"
+
 )
 
 const (
@@ -69,6 +70,9 @@ const (
 
 	// DefaultSeriesIDSetCacheSize is the default number of series ID sets to cache in the TSI index.
 	DefaultSeriesIDSetCacheSize = 100
+
+	// default ha raft addr
+	DefaultHaRaftAddr = "localhost:50051"
 )
 
 // Config holds the configuration for the tsbd package.
@@ -135,6 +139,15 @@ type Config struct {
 	// been found to be problematic in some cases. It may help users who have
 	// slow disks.
 	TSMWillNeed bool `toml:"tsm-use-madv-willneed"`
+
+	// ha raft port
+	HaRaftAddr string `toml:"ha-raft-addr"`
+
+	// ha raft dir
+	HaRaftDir string `toml:"ha-raft-dir"`
+
+	// ha raft id
+	HaRaftId string `toml:"ha-raft-id"`
 }
 
 // NewConfig returns the default configuration for tsdb.
@@ -161,6 +174,7 @@ func NewConfig() Config {
 
 		TraceLoggingEnabled: false,
 		TSMWillNeed:         false,
+		HaRaftAddr: 		 DefaultHaRaftAddr,
 	}
 }
 
@@ -220,5 +234,8 @@ func (c Config) Diagnostics() (*diagnostics.Diagnostics, error) {
 		"max-concurrent-compactions":         c.MaxConcurrentCompactions,
 		"max-index-log-file-size":            c.MaxIndexLogFileSize,
 		"series-id-set-cache-size":           c.SeriesIDSetCacheSize,
+		"ha-raft-addr":						  c.HaRaftAddr,
+		"ha-raft-dir":						  c.HaRaftDir,
+		"ha-raft-id":						  c.HaRaftId,
 	}), nil
 }

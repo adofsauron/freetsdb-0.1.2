@@ -184,11 +184,19 @@ func (cmd *Command) removeMeta(metaAddr, remoteNodeAddr string) error {
 }
 
 const NodeMuxHeader = 9
-const RequestClusterJoin = 0x01
+const RequestClusterJoin = 1
+const RequestDataServerWrite = 2
+const RequestDataServerQuery = 3
 
 type Request struct {
-	Type  uint8
-	Peers []string
+	Type  uint64   `json:"Type"`
+	Peers []string `json:"Peers"`
+	Data  string   `json:"Data"`
+}
+
+type Reponse struct {
+	Code int    `json:"Code"`
+	Msg  string `json:"Msg"`
 }
 
 func (cmd *Command) addData(metaAddr, newNodeAddr string) error {
@@ -196,10 +204,12 @@ func (cmd *Command) addData(metaAddr, newNodeAddr string) error {
 
 	peers, err := cmd.getMetaServers(metaAddr)
 	if err != nil {
+		fmt.Printf("ERROR: addData fail, cmd.getMetaServers ERR, metaAddr = %s, newNodeAddr = %s, err = %v \n", metaAddr, newNodeAddr, err)
 		return err
 	}
 
 	if len(peers) == 0 {
+		fmt.Printf("ERROR: addData fail, no peers, metaAddr = %s, newNodeAddr = %s \n", metaAddr, newNodeAddr)
 		return fmt.Errorf("Failed to get MetaServerInfo: empty Peers")
 	}
 
@@ -209,21 +219,24 @@ func (cmd *Command) addData(metaAddr, newNodeAddr string) error {
 
 	conn, err := tcp.Dial("tcp", newNodeAddr, NodeMuxHeader)
 	if err != nil {
+		fmt.Printf("ERROR: addData fail, tcp.Dial err, metaAddr = %s, newNodeAddr = %s, err = %v \n", metaAddr, newNodeAddr, err)
 		return err
 	}
 	defer conn.Close()
 
 	if err := json.NewEncoder(conn).Encode(r); err != nil {
-		return fmt.Errorf("Encode snapshot request: %s", err)
+		fmt.Printf("ERROR: addData fail, json.NewEncoder.Encode err, metaAddr = %s, newNodeAddr = %s, err = %v \n", metaAddr, newNodeAddr, err)
+		return fmt.Errorf(fmt.Sprintf("Encode snapshot request: %v", err))
 	}
 
 	node := meta.NodeInfo{}
 	if err := json.NewDecoder(conn).Decode(&node); err != nil {
+		fmt.Printf("ERROR: addData fail, json.NewEncoder.Decode err, metaAddr = %s, newNodeAddr = %s, err = %v, node.ID = %d, node.TCPHost = %s \n",
+			metaAddr, newNodeAddr, err, node.ID, node.TCPHost)
 		return err
 	}
 
 	fmt.Printf("Added data node %d at %s\n", node.ID, node.TCPHost)
-
 	return nil
 }
 

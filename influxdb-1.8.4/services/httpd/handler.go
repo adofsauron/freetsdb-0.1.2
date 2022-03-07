@@ -618,36 +618,6 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 	// Execute query.
 	results := h.QueryExecutor.ExecuteQuery(q, opts, closing)
 
-	{
-		raft_qry := ""
-		for _, qry := range query_ori_addr {
-			if "" == qry {
-				continue
-			}
-
-			qry_arr := strings.Fields(qry)
-			if 1 < len(qry_arr) {
-				qry_type := string(qry_arr[0])
-
-				runHaRaft := true
-				if ("SHOW" == qry_type) ||
-					("show" == qry_type) ||
-					("SELECT" == qry_type) ||
-					("select" == qry_type) {
-					runHaRaft = false
-				}
-
-				if runHaRaft {
-					raft_qry = raft_qry + qry + ";"
-				}
-			}
-		}
-
-		if "" != raft_qry {
-			go h.ServeQueryHaRaft(raft_qry, user, opts)
-		}
-	}
-
 	// If we are running in async mode, open a goroutine to drain the results
 	// and return with a StatusNoContent.
 	if async {
@@ -769,6 +739,37 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 			// send in a future chunk.
 			r.Partial = false
 			break
+		}
+	}
+
+	// 关键点在于必须等待本进程处理完, 再向raft日志里写. 好处在于复用了错误处理, TODO:
+	{
+		raft_qry := ""
+		for _, qry := range query_ori_addr {
+			if "" == qry {
+				continue
+			}
+
+			qry_arr := strings.Fields(qry)
+			if 1 < len(qry_arr) {
+				qry_type := string(qry_arr[0])
+
+				runHaRaft := true
+				if ("SHOW" == qry_type) ||
+					("show" == qry_type) ||
+					("SELECT" == qry_type) ||
+					("select" == qry_type) {
+					runHaRaft = false
+				}
+
+				if runHaRaft {
+					raft_qry = raft_qry + qry + ";"
+				}
+			}
+		}
+
+		if "" != raft_qry {
+			go h.ServeQueryHaRaft(raft_qry, user, opts)
 		}
 	}
 

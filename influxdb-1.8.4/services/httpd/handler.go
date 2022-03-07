@@ -431,6 +431,10 @@ func (h *Handler) ServeQueryApply(qry_total string, uid string, opts query.Execu
 	qry_arr := strings.Split(qry_total, ";")
 	for _, qry := range qry_arr {
 
+		if "" == qry {
+			continue
+		}
+
 		q, err := influxql.ParseQuery(qry)
 		if nil != err {
 			h.Logger.Error(fmt.Sprintf("http::ServeQueryApply fail, influxql.ParseQuery err = %v,  query = %s", err, qry))
@@ -493,7 +497,6 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 	{
 		values := r.URL.Query()
 		for i, q := range values["q"] {
-			h.Logger.Info(fmt.Sprintf("QUERY i: %d, q: %s", i, q))
 			query_ori_addr[i] = q
 		}
 	}

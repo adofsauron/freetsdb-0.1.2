@@ -3,6 +3,7 @@ package influxql
 import (
 	"bytes"
 	"regexp"
+
 )
 
 var (

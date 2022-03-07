@@ -5,11 +5,9 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
@@ -54,7 +52,7 @@ const (
 )
 
 type WritePointsPrivilegedApply func(database, retentionPolicy string, consistencyLevel uint64, points []models.Point) error
-type ServeQueryApply func(qr io.Reader, uid string, opts query.ExecutionOptions) error
+type ServeQueryApply func(qry string, uid string, opts query.ExecutionOptions) error
 
 type Service struct {
 	wg  sync.WaitGroup
@@ -171,7 +169,7 @@ func (s *Service) newRaft(ctx context.Context, haRaftDir string, myID string, my
 			return nil, nil, fmt.Errorf(`newRaft fail, PathExists fail, dir = %s, err = %v`, raftDir, err)
 		}
 
-		if false == isExist {
+		if !isExist {
 			raftBootstrap = true
 
 			err := os.Mkdir(raftDir, os.ModePerm)
@@ -339,19 +337,19 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 	r.Data = string(s.MarshalWrite(database, retentionPolicy, consistencyLevel, points))
 
 	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
-	if err != nil {
+	if nil != err {
 		s.Logger.Error(fmt.Sprintf("ERROR: addData fail, tcp.Dial err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return err
 	}
 	defer conn.Close()
 
-	if err := json.NewEncoder(conn).Encode(r); err != nil {
+	if err := json.NewEncoder(conn).Encode(r); nil != err {
 		s.Logger.Error(fmt.Sprintf("ERROR: addData fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return fmt.Errorf(fmt.Sprintf("Encode snapshot request: %v", err))
 	}
 
 	res := Reponse{}
-	if err := json.NewDecoder(conn).Decode(&res); err != nil {
+	if err := json.NewDecoder(conn).Decode(&res); nil != err {
 		s.Logger.Error(fmt.Sprintf("ERROR: addData fail, json.NewEncoder.Decode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return err
 	}
@@ -372,49 +370,35 @@ func (s *Service) IstLeader() bool {
 	return g_localaddr == s.GetLeader()
 }
 
-func (s *Service) MarshalQuery(qr io.Reader, uid string, opts query.ExecutionOptions) ([]byte, error) {
+func (s *Service) MarshalQuery(qry string, uid string, opts query.ExecutionOptions) ([]byte, error) {
 	b := make([]byte, 8)
 
 	index := 0
 	{
-		s.Logger.Info(fmt.Sprintf("MarshalQuery RT index : %d", index))
+		s.Logger.Debug(fmt.Sprintf("MarshalQuery RT index : %d", index))
 		binary.BigEndian.PutUint64(b, (uint64)(RFTYPE_QUERY))
 
 		index = index + 8
 	}
 
 	{
-		b_n_qr := make([]byte, 4096)
-		qrLen, err := qr.Read(b_n_qr)
+		queryLen := uint64(len(qry))
 
-		s.Logger.Info(fmt.Sprintf("MarshalQuery qr len index : %d, qrLen: %d", index, qrLen))
-		if 0 < qrLen {
-			if nil != err {
-				s.Logger.Error(fmt.Sprintf(`haraft MarshalQuery fail, qr.Read err = %v`, err))
-				return nil, err
-			}
+		s.Logger.Debug(fmt.Sprintf("MarshalQuery query len index : %d, queryLen: %d", index, queryLen))
 
-		}
+		b_n := make([]byte, 8)
+		binary.BigEndian.PutUint64(b_n, queryLen)
+		b = append(b, b_n...)
 
-		{
-			b_n := make([]byte, 8)
-			binary.BigEndian.PutUint64(b_n, (uint64)(qrLen))
-			b = append(b, b_n...)
+		b = append(b, []byte(qry)...)
 
-			index = index + 8
-		}
-
-		if 0 < qrLen {
-			b = append(b, b_n_qr[0:qrLen]...)
-
-			index = index + qrLen
-		}
+		index = index + 8 + int(queryLen)
 	}
 
 	{
 		uidLen := uint64(len(uid))
 
-		s.Logger.Info(fmt.Sprintf("MarshalQuery uid len index : %d, uidLen: %d", index, uidLen))
+		s.Logger.Debug(fmt.Sprintf("MarshalQuery uid len index : %d, uidLen: %d", index, uidLen))
 
 		b_n := make([]byte, 8)
 		binary.BigEndian.PutUint64(b_n, uidLen)
@@ -440,7 +424,7 @@ func (s *Service) MarshalQuery(qr io.Reader, uid string, opts query.ExecutionOpt
 
 			databaseLen := uint64(len(database))
 
-			s.Logger.Info(fmt.Sprintf("MarshalQuery database len index : %d, databaseLen: %d", index, databaseLen))
+			s.Logger.Debug(fmt.Sprintf("MarshalQuery database len index : %d, databaseLen: %d", index, databaseLen))
 
 			b_n := make([]byte, 8)
 			binary.BigEndian.PutUint64(b_n, databaseLen)
@@ -456,7 +440,7 @@ func (s *Service) MarshalQuery(qr io.Reader, uid string, opts query.ExecutionOpt
 		{
 			retentionPolicyLen := uint64(len(retentionPolicy))
 
-			s.Logger.Info(fmt.Sprintf("MarshalQuery retentionPolicy len index : %d, retentionPolicyLen: %d", index, retentionPolicyLen))
+			s.Logger.Debug(fmt.Sprintf("MarshalQuery retentionPolicy len index : %d, retentionPolicyLen: %d", index, retentionPolicyLen))
 
 			b_n := make([]byte, 8)
 			binary.BigEndian.PutUint64(b_n, retentionPolicyLen)
@@ -470,7 +454,7 @@ func (s *Service) MarshalQuery(qr io.Reader, uid string, opts query.ExecutionOpt
 		}
 
 		{
-			s.Logger.Info(fmt.Sprintf("MarshalQuery chunkSize len index : %d", index))
+			s.Logger.Debug(fmt.Sprintf("MarshalQuery chunkSize len index : %d", index))
 
 			b_n := make([]byte, 8)
 			binary.BigEndian.PutUint64(b_n, chunkSize)
@@ -480,7 +464,7 @@ func (s *Service) MarshalQuery(qr io.Reader, uid string, opts query.ExecutionOpt
 		}
 
 		{
-			s.Logger.Info(fmt.Sprintf("MarshalQuery nodeID len index : %d", index))
+			s.Logger.Debug(fmt.Sprintf("MarshalQuery nodeID len index : %d", index))
 
 			b_n := make([]byte, 8)
 			binary.BigEndian.PutUint64(b_n, nodeID)
@@ -492,7 +476,7 @@ func (s *Service) MarshalQuery(qr io.Reader, uid string, opts query.ExecutionOpt
 		{
 			readOnlyLen := uint64(len(readOnly))
 
-			s.Logger.Info(fmt.Sprintf("MarshalQuery readOnly len index : %d, readOnlyLen: %d", index, readOnlyLen))
+			s.Logger.Debug(fmt.Sprintf("MarshalQuery readOnly len index : %d, readOnlyLen: %d", index, readOnlyLen))
 
 			b_n := make([]byte, 8)
 			binary.BigEndian.PutUint64(b_n, readOnlyLen)
@@ -504,60 +488,57 @@ func (s *Service) MarshalQuery(qr io.Reader, uid string, opts query.ExecutionOpt
 		}
 	}
 
-	s.Logger.Info(fmt.Sprintf("MarshalQuery over index : %d", index))
+	s.Logger.Debug(fmt.Sprintf("MarshalQuery over index : %d", index))
 
 	return b, nil
 }
 
-func (s *Service) UnmarshalQuery(b []byte) (io.Reader, string, query.ExecutionOptions, error) {
+func (s *Service) UnmarshalQuery(b []byte) (string, string, query.ExecutionOptions, error) {
 
 	index := (uint64)(0)
 	over := index + 8
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery rt len index : %d", index))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery rt len index : %d", index))
 
 	uid := ""
+	qry := ""
 	var opts query.ExecutionOptions
-	var qr io.Reader
 
 	index = over
 	over = index + 8
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery qr len index : %d", index))
-	qrLen := binary.BigEndian.Uint64(b[index:over])
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery query len index : %d", index))
+	queryLen := binary.BigEndian.Uint64(b[index:over])
 
-	if 0 < qrLen {
-		index = over
-		over = index + qrLen
+	index = over
+	over = over + queryLen
 
-		s.Logger.Info(fmt.Sprintf("UnmarshalQuery qr value index : %d, qrLen: %d", index, qrLen))
-		str := string(b[index:over])
-		qr = strings.NewReader(str)
-	}
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery query value index : %d, queryLen: %d", index, queryLen))
+	qry = (string)(b[index:over])
 
 	index = over
 	over = index + 8
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery uid len index : %d", index))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery uid len index : %d", index))
 	uidLen := binary.BigEndian.Uint64(b[index:over])
 
 	index = over
 	over = over + uidLen
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery uid value index : %d, uidLen: %d", index, uidLen))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery uid value index : %d, uidLen: %d", index, uidLen))
 	uid = (string)(b[index:over])
 
 	index = over
 	over = index + 8
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery database len index : %d", index))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery database len index : %d", index))
 	databaseLen := binary.BigEndian.Uint64(b[index:over])
 
 	if 0 < databaseLen {
 		index = over
 		over = over + databaseLen
 
-		s.Logger.Info(fmt.Sprintf("UnmarshalQuery database value index : %d, databaseLen: %d", index, databaseLen))
+		s.Logger.Debug(fmt.Sprintf("UnmarshalQuery database value index : %d, databaseLen: %d", index, databaseLen))
 		database := (string)(b[index:over])
 		opts.Database = database
 	}
@@ -565,14 +546,14 @@ func (s *Service) UnmarshalQuery(b []byte) (io.Reader, string, query.ExecutionOp
 	index = over
 	over = index + 8
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery retentionPolicy len index : %d", index))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery retentionPolicy len index : %d", index))
 	retentionPolicyLen := binary.BigEndian.Uint64(b[index:over])
 
 	if 0 < retentionPolicyLen {
 		index = over
 		over = over + retentionPolicyLen
 
-		s.Logger.Info(fmt.Sprintf("UnmarshalQuery retentionPolicy value index : %d, databaseLen: %d", index, retentionPolicyLen))
+		s.Logger.Debug(fmt.Sprintf("UnmarshalQuery retentionPolicy value index : %d, databaseLen: %d", index, retentionPolicyLen))
 		retentionPolicy := (string)(b[index:over])
 		opts.RetentionPolicy = retentionPolicy
 	}
@@ -580,49 +561,58 @@ func (s *Service) UnmarshalQuery(b []byte) (io.Reader, string, query.ExecutionOp
 	index = over
 	over = index + 8
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery chunkSize len index : %d", index))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery chunkSize len index : %d", index))
 	chunkSize := binary.BigEndian.Uint64(b[index:over])
 	opts.ChunkSize = int(chunkSize)
 
 	index = over
 	over = index + 8
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery nodeID len index : %d", index))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery nodeID len index : %d", index))
 	nodeID := binary.BigEndian.Uint64(b[index:over])
 	opts.NodeID = nodeID
 
 	index = over
 	over = index + 8
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery readOnly len index : %d", index))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery readOnly len index : %d", index))
 	readOnlyLen := binary.BigEndian.Uint64(b[index:over])
 
 	index = over
 	over = over + readOnlyLen
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery readOnly value index : %d, readOnlyLen: %d", index, readOnlyLen))
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery readOnly value index : %d, readOnlyLen: %d", index, readOnlyLen))
 	readonly := (string)(b[index:over])
 	opts.ReadOnly = readonly == "true"
 
 	index = over
 
-	s.Logger.Info(fmt.Sprintf("UnmarshalQuery  over index : %d", index))
-	return qr, uid, opts, nil
+	s.Logger.Debug(fmt.Sprintf("UnmarshalQuery  over index : %d", index))
+	return qry, uid, opts, nil
 }
 
-func (s *Service) ServeQuery(qr io.Reader, uid string, opts query.ExecutionOptions) error {
-	b, err := s.MarshalQuery(qr, uid, opts)
+func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions) error {
+	b, err := s.MarshalQuery(qry, uid, opts)
 	if nil != err {
 		s.Logger.Error(fmt.Sprintf(`haraft ServeQuery fail, MarshalQuery err = %v`, err))
 		return err
 	}
 
+	s.Logger.Info(fmt.Sprintf("haraft ServeQuery, query: %s, uid: %s", qry, uid))
+
 	// leader
 
 	leaderAddr := s.GetLeader()
 	if g_localaddr == leaderAddr {
-		s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am leader: %s", leaderAddr))
-		return s.Apply(b, time.Second)
+		s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am leader: %s, call raft.Apply on myself", leaderAddr))
+		err := s.Apply(b, time.Second)
+		if nil != err {
+			s.Logger.Info(fmt.Sprintf("haraft ServeQuery fail, raft.Apply err = %v", err))
+			return err
+		}
+
+		s.Logger.Info(fmt.Sprintf("haraft ServeQuery ok, raft.Apply over, query = %s", qry))
+		return nil
 	}
 
 	// follow proxy
@@ -635,27 +625,28 @@ func (s *Service) ServeQuery(qr io.Reader, uid string, opts query.ExecutionOptio
 	r.Data = string(b)
 
 	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
-	if err != nil {
+	if nil != err {
 		s.Logger.Error(fmt.Sprintf("haraft ServeQuery, addData fail, tcp.Dial err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return err
 	}
 	defer conn.Close()
 
-	if err := json.NewEncoder(conn).Encode(r); err != nil {
+	if err := json.NewEncoder(conn).Encode(r); nil != err {
 		s.Logger.Error(fmt.Sprintf("haraft ServeQuery, addData fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return fmt.Errorf(fmt.Sprintf("Encode snapshot request: %v", err))
 	}
 
 	res := Reponse{}
-	if err := json.NewDecoder(conn).Decode(&res); err != nil {
+	if err := json.NewDecoder(conn).Decode(&res); nil != err {
 		s.Logger.Error(fmt.Sprintf("haraft ServeQuery, addData fail, json.NewEncoder.Decode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return err
 	}
 
 	if 0 != res.Code {
-		s.Logger.Error(fmt.Sprintf(`haraft ServeQuery fail, code = %d, msg = %s`, res.Code, res.Msg))
-		return fmt.Errorf(`haraft ServeQuery fail, code = %d, msg = %s`, res.Code, res.Msg)
+		s.Logger.Error(fmt.Sprintf("haraft ServeQuery fail, code = %d, msg = %s", res.Code, res.Msg))
+		return fmt.Errorf("haraft ServeQuery fail, code = %d, msg = %s", res.Code, res.Msg)
 	}
 
+	s.Logger.Info(fmt.Sprintf("haraft ServeQuery proxy ok, to leader : %s", leaderAddr))
 	return nil
 }

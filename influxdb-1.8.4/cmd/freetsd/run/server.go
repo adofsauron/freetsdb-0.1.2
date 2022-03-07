@@ -766,20 +766,20 @@ func (s *Server) WritePoints(conn net.Conn, data string) {
 	if nil != err {
 		res.Code = -1
 		res.Msg = fmt.Sprintf("WritePoints fail, HaRaftService.UnmarshalWrite err = %v", err)
-		goto WT
+		goto WWT
 	}
 
 	err = s.HaRaftService.WritePointsPrivileged(database, retentionPolicy, consistencyLevel, points)
 	if nil != err {
 		res.Code = -1
 		res.Msg = fmt.Sprintf("WritePoints fail, HaRaftService.WritePointsPrivileged err = %v", err)
-		goto WT
+		goto WWT
 	}
 
 	res.Code = 0
 	res.Msg = "ok"
 
-WT:
+WWT:
 	if err := json.NewEncoder(conn).Encode(res); err != nil {
 		log.Printf("WritePoints fail, Error writing response", err.Error())
 	}
@@ -788,24 +788,24 @@ WT:
 func (s *Server) ExecuteQuery(conn net.Conn, data string) {
 	b := []byte(data)
 	res := Reponse{}
-	qr, uid, opts, err := s.HaRaftService.UnmarshalQuery(b)
+	qry, uid, opts, err := s.HaRaftService.UnmarshalQuery(b)
 	if nil != err {
 		res.Code = -1
 		res.Msg = fmt.Sprintf("ExecuteQuery fail, HaRaftService.UnmarshalWrite err = %v", err)
-		goto WT
+		goto QWT
 	}
 
-	err = s.HaRaftService.ServeQuery(qr, uid, opts)
+	err = s.HaRaftService.ServeQuery(qry, uid, opts)
 	if nil != err {
 		res.Code = -1
 		res.Msg = fmt.Sprintf("ExecuteQuery fail, HaRaftService.WritePointsPrivileged err = %v", err)
-		goto WT
+		goto QWT
 	}
 
 	res.Code = 0
 	res.Msg = "ok"
 
-WT:
+QWT:
 	if err := json.NewEncoder(conn).Encode(res); err != nil {
 		log.Printf("ExecuteQuery fail, Error writing response", err.Error())
 	}

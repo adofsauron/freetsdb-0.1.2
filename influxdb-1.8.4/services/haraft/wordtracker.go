@@ -38,13 +38,13 @@ func cloneWords(words [3]string) []string {
 func (f *wordTracker) ApplyWritePoint(b []byte) error {
 	database, retentionPolicy, consistencyLevel, points, err := f.HaRaftService.UnmarshalWrite(b)
 	if nil != err {
-		f.HaRaftService.Logger.Error(fmt.Sprintf("ERROR: wordTracker ApplyWritePoint fail, UnmarshalWrite err = %s", err.Error()))
+		f.HaRaftService.Logger.Error(fmt.Sprintf("ERROR: wordTracker ApplyWritePoint fail, UnmarshalWrite err = %v", err))
 		return err
 	}
 
 	err = f.HaRaftService.WritePointsPrivilegedApply(database, retentionPolicy, consistencyLevel, points)
 	if nil != err {
-		f.HaRaftService.Logger.Error(fmt.Sprintf("ERROR: wordTracker ApplyWritePoint fail, PointsWriter WriteToShardApply err = %s", err.Error()))
+		f.HaRaftService.Logger.Error(fmt.Sprintf("ERROR: wordTracker ApplyWritePoint fail, PointsWriter WriteToShardApply err = %v", err))
 		return err
 	}
 
@@ -58,19 +58,24 @@ func (f *wordTracker) ApplyQuery(b []byte) error {
 		return nil
 	}
 
-	qr, uid, opts, err := f.HaRaftService.UnmarshalQuery(b)
+	qry, uid, opts, err := f.HaRaftService.UnmarshalQuery(b)
 	if nil != err {
 		f.HaRaftService.Logger.Error(fmt.Sprint("ERROR: wordTracker ApplyQuery fail, UnmarshalQuery err = %s", err.Error()))
 		return err
 	}
 
-	err = f.HaRaftService.ServeQueryApply(qr, uid, opts)
+	if "" == qry {
+		f.HaRaftService.Logger.Info(fmt.Sprint("wordTracker ApplyQuery no execute, query is nil, uid: %s", uid))
+		return nil
+	}
+
+	err = f.HaRaftService.ServeQueryApply(qry, uid, opts)
 	if nil != err {
-		f.HaRaftService.Logger.Error(fmt.Sprint("ERROR: wordTracker ApplyQuery fail, ServeQueryApply err = %s", err.Error()))
+		f.HaRaftService.Logger.Error(fmt.Sprint("ERROR: wordTracker ApplyQuery fail, ServeQueryApply err = %v, uid:%s", err, uid))
 		return err
 	}
 
-	f.HaRaftService.Logger.Info(fmt.Sprintf("wordTracker ApplyQuery ok, database: %s, uid: %s ", opts.Database, uid))
+	f.HaRaftService.Logger.Info(fmt.Sprintf("wordTracker ApplyQuery ok, database: %s, uid: %s", opts.Database, uid))
 	return nil
 }
 
@@ -83,7 +88,7 @@ func (f *wordTracker) Apply(l *raft.Log) interface{} {
 	b_n := b[0:8]
 	rf_type := int(binary.BigEndian.Uint64(b_n))
 
-	f.HaRaftService.Logger.Info(fmt.Sprintf("wordTracker Apply, rf_type: %d ", rf_type))
+	f.HaRaftService.Logger.Info(fmt.Sprintf("wordTracker Apply, rf_type: %d", rf_type))
 
 	rf_type = (int)(rf_type)
 	switch rf_type {

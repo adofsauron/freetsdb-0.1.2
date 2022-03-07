@@ -141,8 +141,8 @@ type Handler struct {
 
 var g_handler *Handler
 
-func ServeQueryApply(qr io.Reader, uid string, opts query.ExecutionOptions) error {
-	return g_handler.ServeQueryApply(qr, uid, opts)
+func ServeQueryApply(qry string, uid string, opts query.ExecutionOptions) error {
+	return g_handler.ServeQueryApply(qry, uid, opts)
 }
 
 // NewHandler returns a new instance of handler with routes.
@@ -412,7 +412,7 @@ func (h *Handler) writeHeader(w http.ResponseWriter, code int) {
 	w.WriteHeader(code)
 }
 
-func (h *Handler) ServeQueryHaRaft(qr io.Reader, user meta.User, opts query.ExecutionOptions) error {
+func (h *Handler) ServeQueryHaRaft(qry string, user meta.User, opts query.ExecutionOptions) error {
 	uid := "nil"
 	if nil != user {
 		uid = user.ID()
@@ -422,22 +422,26 @@ func (h *Handler) ServeQueryHaRaft(qr io.Reader, user meta.User, opts query.Exec
 		uid = "nil"
 	}
 
-	return h.HaRaftService.ServeQuery(qr, uid, opts)
+	return h.HaRaftService.ServeQuery(qry, uid, opts)
 }
 
-func (h *Handler) ServeQueryApply(qr io.Reader, uid string, opts query.ExecutionOptions) error {
-	h.Logger.Info(fmt.Sprintf("http::ServeQueryApply, uid = %s", uid))
+func (h *Handler) ServeQueryApply(qry_total string, uid string, opts query.ExecutionOptions) error {
+	h.Logger.Info(fmt.Sprintf("http::ServeQueryApply, uid = %s, query = %s", uid, qry_total))
 
-	p := influxql.NewParser(qr)
-	q, err := p.ParseQuery()
-	if nil != err {
-		h.Logger.Error(fmt.Sprintf("http::ServeQueryApply fail, p.ParseQuery err = %v", err))
-		return err
+	qry_arr := strings.Split(qry_total, ";")
+	for _, qry := range qry_arr {
+
+		q, err := influxql.ParseQuery(qry)
+		if nil != err {
+			h.Logger.Error(fmt.Sprintf("http::ServeQueryApply fail, influxql.ParseQuery err = %v,  query = %s", err, qry))
+			return err
+		}
+
+		results := h.QueryExecutor.ExecuteQuery(q, opts, nil)
+
+		h.Logger.Info(fmt.Sprintf("httpd::ServeQueryApply, results = %v, qry = %s", results, qry))
 	}
 
-	results := h.QueryExecutor.ExecuteQuery(q, opts, nil)
-
-	h.Logger.Info(fmt.Sprintf("httpd::ServeQueryApply, results = %v", results))
 	return nil
 }
 
@@ -485,6 +489,15 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 	p := influxql.NewParser(qr)
 	db := r.FormValue("db")
 
+	query_ori_addr := make([]string, len(r.URL.Query()))
+	{
+		values := r.URL.Query()
+		for i, q := range values["q"] {
+			h.Logger.Info(fmt.Sprintf("QUERY i: %d, q: %s", i, q))
+			query_ori_addr[i] = q
+		}
+	}
+
 	// Sanitize the request query params so it doesn't show up in the response logger.
 	// Do this before anything else so a parsing error doesn't leak passwords.
 	sanitize(r)
@@ -519,7 +532,7 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 		p.SetParams(params)
 	}
 
-	// Parse query from query string.
+	// Parse query from qry string.
 	q, err := p.ParseQuery()
 	if err != nil {
 		h.httpError(rw, "error parsing query: "+err.Error(), http.StatusBadRequest)
@@ -603,7 +616,33 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 	results := h.QueryExecutor.ExecuteQuery(q, opts, closing)
 
 	{
-		go h.ServeQueryHaRaft(qr, user, opts)
+		raft_qry := ""
+		for _, qry := range query_ori_addr {
+			if "" == qry {
+				continue
+			}
+
+			qry_arr := strings.Fields(qry)
+			if 1 < len(qry_arr) {
+				qry_type := string(qry_arr[0])
+
+				runHaRaft := true
+				if ("SHOW" == qry_type) ||
+					("show" == qry_type) ||
+					("SELECT" == qry_type) ||
+					("select" == qry_type) {
+					runHaRaft = false
+				}
+
+				if runHaRaft {
+					raft_qry = raft_qry + qry + ";"
+				}
+			}
+		}
+
+		if "" != raft_qry {
+			go h.ServeQueryHaRaft(raft_qry, user, opts)
+		}
 	}
 
 	// If we are running in async mode, open a goroutine to drain the results

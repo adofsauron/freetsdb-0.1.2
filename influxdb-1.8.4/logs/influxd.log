@@ -102,3 +102,44 @@ ts=2022-03-08T09:43:01.127324Z lvl=info msg="Executing query" log_id=0_6EIk20000
 [httpd] ::1 - - [08/Mar/2022:17:43:01 +0800] "POST /query?db=&epoch=ns&q=SHOW+DATABASES HTTP/1.1" 200 106 "-" "InfluxDBShell/1.8.4" 24e2e36a-9ec4-11ec-8002-000c29bd2ca7 933
 ts=2022-03-08T09:43:05.999330Z lvl=info msg="Executing query" log_id=0_6EIk20000 service=query query="SELECT * FROM test.autogen.cpu"
 [httpd] ::1 - - [08/Mar/2022:17:43:05 +0800] "POST /query?chunked=true&db=test&epoch=ns&q=select+%2A+from+cpu HTTP/1.1" 200 124 "-" "InfluxDBShell/1.8.4" 27ca4d82-9ec4-11ec-8003-000c29bd2ca7 2118
+ts=2022-03-08T09:52:52.962538Z lvl=info msg="Compacting cache" log_id=0_6EIk20000 engine=tsm1 path=/data/influxdb/data/test/autogen/1
+ts=2022-03-08T09:52:52.962672Z lvl=info msg="Cache snapshot (start)" log_id=0_6EIk20000 engine=tsm1 trace_id=0_6Ez4tW000 op_name=tsm1_cache_snapshot op_event=start
+ts=2022-03-08T09:52:52.963256Z lvl=info msg="Snapshot for path deduplicated" log_id=0_6EIk20000 engine=tsm1 path=/data/influxdb/data/test/autogen/1 duration=0.057ms
+ts=2022-03-08T09:52:52.967091Z lvl=info msg="Removing WAL file" log_id=0_6EIk20000 engine=tsm1 service=wal path=/data/influxdb/wal/test/autogen/1/_00001.wal
+ts=2022-03-08T09:52:52.967195Z lvl=info msg="Snapshot for path written" log_id=0_6EIk20000 engine=tsm1 trace_id=0_6Ez4tW000 op_name=tsm1_cache_snapshot path=/data/influxdb/data/test/autogen/1 duration=4.531ms
+ts=2022-03-08T09:52:52.967208Z lvl=info msg="Cache snapshot (end)" log_id=0_6EIk20000 engine=tsm1 trace_id=0_6Ez4tW000 op_name=tsm1_cache_snapshot op_event=end op_elapsed=4.541ms
+ts=2022-03-08T09:57:37.446515Z lvl=info msg="ProxyServiceHandle ready ApplyByte, byteLen = 96" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:57:37.446602Z lvl=info msg="ProxyServiceProcessByte, rf_type: 2" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:57:37.450052Z lvl=info msg="WordTracker Apply, rf_type: 2" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:57:37.450138Z lvl=info msg="http::ServeQueryApply, uid = nil, query = create database test02;" log_id=0_6EIk20000 service=httpd
+ts=2022-03-08T09:57:37.450261Z lvl=info msg="httpd::ServeQueryApply, results = 0xc000624ae0, qry = create database test02" log_id=0_6EIk20000 service=httpd
+ts=2022-03-08T09:57:37.450274Z lvl=info msg="WordTracker ApplyQuery ok, database: , uid: nil" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:57:37.450283Z lvl=info msg="haraft ServeQuery ok, raft.Apply ok" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:57:37.450294Z lvl=info msg="ProxyServiceHandle ignore, 0 == byteLen" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:57:37.450397Z lvl=info msg="Executing query" log_id=0_6EIk20000 service=query query="CREATE DATABASE test02"
+ts=2022-03-08T09:58:05.989100Z lvl=info msg="ProxyServiceHandle ready ApplyByte, byteLen = 96" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:58:05.989193Z lvl=info msg="ProxyServiceProcessByte, rf_type: 2" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:58:05.991531Z lvl=info msg="WordTracker Apply, rf_type: 2" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:58:05.991634Z lvl=info msg="http::ServeQueryApply, uid = nil, query = create database test03;" log_id=0_6EIk20000 service=httpd
+ts=2022-03-08T09:58:05.991718Z lvl=info msg="httpd::ServeQueryApply, results = 0xc0009ed5c0, qry = create database test03" log_id=0_6EIk20000 service=httpd
+ts=2022-03-08T09:58:05.991727Z lvl=info msg="WordTracker ApplyQuery ok, database: , uid: nil" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:58:05.991738Z lvl=info msg="haraft ServeQuery ok, raft.Apply ok" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:58:05.991750Z lvl=info msg="ProxyServiceHandle ignore, 0 == byteLen" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T09:58:05.991846Z lvl=info msg="Executing query" log_id=0_6EIk20000 service=query query="CREATE DATABASE test03"
+ts=2022-03-08T09:58:44.987395Z lvl=info msg="Executing query" log_id=0_6EIk20000 service=query query="SHOW DATABASES"
+[httpd] ::1 - - [08/Mar/2022:17:58:44 +0800] "POST /query?chunked=true&db=test&epoch=ns&q=show+databases HTTP/1.1" 200 117 "-" "InfluxDBShell/1.8.4" 5778831e-9ec6-11ec-8004-000c29bd2ca7 3766
+ts=2022-03-08T10:11:21.886988Z lvl=info msg="Retention policy deletion check (start)" log_id=0_6EIk20000 service=retention trace_id=0_6G1lcW000 op_name=retention_delete_check op_event=start
+ts=2022-03-08T10:11:21.887075Z lvl=info msg="Retention policy deletion check (end)" log_id=0_6EIk20000 service=retention trace_id=0_6G1lcW000 op_name=retention_delete_check op_event=end op_elapsed=0.187ms
+ts=2022-03-08T10:14:29.714965Z lvl=info msg="ProxyServiceHandle ready ApplyByte, byteLen = 164" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T10:14:29.715042Z lvl=info msg="ProxyServiceProcessByte, rf_type: 2" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T10:14:29.719137Z lvl=info msg="WordTracker Apply, rf_type: 2" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T10:14:29.719332Z lvl=info msg="http::ServeQueryApply, uid = nil, query = CREATE USER \"u_t03\" WITH PASSWORD [REDACTED] USER \"u_t04\" WITH PASSWORD [REDACTED]" log_id=0_6EIk20000 service=httpd
+ts=2022-03-08T10:14:29.719500Z lvl=info msg="httpd::ServeQueryApply, results = 0xc00092cb40, qry = CREATE USER \"u_t03\" WITH PASSWORD [REDACTED]" log_id=0_6EIk20000 service=httpd
+ts=2022-03-08T10:14:29.719575Z lvl=info msg="httpd::ServeQueryApply, results = 0xc00092cba0, qry = CREATE USER \"u_t04\" WITH PASSWORD [REDACTED]" log_id=0_6EIk20000 service=httpd
+ts=2022-03-08T10:14:29.719585Z lvl=info msg="WordTracker ApplyQuery ok, database: , uid: nil" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T10:14:29.719609Z lvl=info msg="haraft ServeQuery ok, raft.Apply ok" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T10:14:29.719619Z lvl=info msg="ProxyServiceHandle ignore, 0 == byteLen" log_id=0_6EIk20000 service=haraft
+ts=2022-03-08T10:14:29.720100Z lvl=info msg="Executing query" log_id=0_6EIk20000 service=query query="CREATE USER u_t03 WITH PASSWORD [REDACTED]"
+ts=2022-03-08T10:14:29.720110Z lvl=info msg="Executing query" log_id=0_6EIk20000 service=query query="CREATE USER u_t04 WITH PASSWORD [REDACTED]"
+ts=2022-03-08T10:14:43.736743Z lvl=info msg="Executing query" log_id=0_6EIk20000 service=query query="SHOW USERS"
+[httpd] ::1 - - [08/Mar/2022:18:14:43 +0800] "POST /query?chunked=true&db=test&epoch=ns&q=show+users HTTP/1.1" 200 115 "-" "InfluxDBShell/1.8.4" 92ee0eb6-9ec8-11ec-8005-000c29bd2ca7 988

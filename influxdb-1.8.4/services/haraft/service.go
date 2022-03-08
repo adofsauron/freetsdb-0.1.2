@@ -23,6 +23,7 @@ import (
 	"influxdb.cluster/models"
 	"influxdb.cluster/query"
 	pb "influxdb.cluster/services/haraft/internal"
+	"influxdb.cluster/services/influxql"
 	"influxdb.cluster/tcp"
 	"influxdb.cluster/tsdb"
 
@@ -101,9 +102,9 @@ func (s *Service) serve() {
 	haRaftDir := s.EngineOptions.Config.HaRaftDir
 	haRaftId := s.EngineOptions.Config.HaRaftId
 
-	s.Logger.Info(fmt.Sprintf("haraft serve haRaftAddr: %s", haRaftAddr))
-	s.Logger.Info(fmt.Sprintf("haraft serve haRaftDir: %s", haRaftDir))
-	s.Logger.Info(fmt.Sprintf("haraft serve haRaftId: %s", haRaftId))
+	s.Logger.Info(fmt.Sprintf("haraft serve haRaftAddr = %s", haRaftAddr))
+	s.Logger.Info(fmt.Sprintf("haraft serve haRaftDir = %s", haRaftDir))
+	s.Logger.Info(fmt.Sprintf("haraft serve haRaftId = %s", haRaftId))
 
 	ctx := context.Background()
 	_, port, err := net.SplitHostPort(haRaftAddr)
@@ -113,7 +114,8 @@ func (s *Service) serve() {
 	}
 	sock, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if nil != err {
-		s.Logger.Error(fmt.Sprintf("failed to listen: %v", err))
+		s.Logger.Error(fmt.Sprintf("failed to listen err = %v", err))
+		return
 	}
 
 	wt := &wordTracker{
@@ -121,7 +123,7 @@ func (s *Service) serve() {
 	}
 	r, tm, err := s.newRaft(ctx, haRaftDir, haRaftId, haRaftAddr, wt)
 	if nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft failed to start raft: %v", err))
+		s.Logger.Error(fmt.Sprintf("haraft failed to start raft err = %v", err))
 		return
 	}
 
@@ -140,7 +142,7 @@ func (s *Service) serve() {
 
 	g_localaddr = haRaftAddr
 	if err := grpcSrv.Serve(sock); nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft failed to start server: %v", err))
+		s.Logger.Error(fmt.Sprintf("haraft failed to start server err =  %v", err))
 		return
 	}
 }
@@ -325,21 +327,21 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 
 	leaderAddr := s.GetLeader()
 	if g_localaddr == leaderAddr {
-		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply, I'am leader: %s", leaderAddr))
+		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply, I'am leader = %s", leaderAddr))
 		b := s.MarshalWrite(database, retentionPolicy, consistencyLevel, points)
 		err := s.Apply(b, time.Second)
 		if nil != err {
-			s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged Apply fail, err: %s", leaderAddr))
+			s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged Apply fail, err = %s", leaderAddr))
 			return err
 		}
 
-		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply ok, database: %s, retentionPolicy: %s", database, retentionPolicy))
+		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply ok, database = %s, retentionPolicy = %s", database, retentionPolicy))
 		return nil
 	}
 
 	// follow proxy
 
-	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged proxy, I'am follow, proxy to leader : %s", leaderAddr))
+	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged proxy, I'am follow, proxy to leader = %s", leaderAddr))
 
 	r := Request{}
 	r.Type = RequestDataServerWrite
@@ -607,26 +609,28 @@ func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions
 		return err
 	}
 
-	s.Logger.Info(fmt.Sprintf("haraft ServeQuery, query: %s, uid: %s", qry, uid))
+	qry_log := influxql.Sanitize(qry)
+
+	s.Logger.Info(fmt.Sprintf("haraft ServeQuery, query = %s, uid = %s", qry_log, uid))
 
 	// leader
 
 	leaderAddr := s.GetLeader()
 	if g_localaddr == leaderAddr {
-		s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am leader: %s, call raft.Apply on myself", leaderAddr))
+		s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am leader = %s, call raft.Apply on myself", leaderAddr))
 		err := s.Apply(b, time.Second)
 		if nil != err {
 			s.Logger.Info(fmt.Sprintf("haraft ServeQuery fail, raft.Apply err = %v", err))
 			return err
 		}
 
-		s.Logger.Info(fmt.Sprintf("haraft ServeQuery ok, raft.Apply over, query = %s", qry))
+		s.Logger.Info(fmt.Sprintf("haraft ServeQuery ok, raft.Apply over, query = %s", qry_log))
 		return nil
 	}
 
 	// follow proxy
 
-	s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am follow, proxy to leader : %s", leaderAddr))
+	s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am follow, proxy to leader = %s", leaderAddr))
 
 	r := Request{}
 	r.Type = RequestDataServerQuery
@@ -635,13 +639,13 @@ func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions
 
 	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
 	if nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft ServeQuery, addData fail, tcp.Dial err, leaderAddr = %s, err = %v \n", leaderAddr, err))
+		s.Logger.Error(fmt.Sprintf("haraft ServeQuery fail, tcp.Dial err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return err
 	}
 	defer conn.Close()
 
 	if err := json.NewEncoder(conn).Encode(r); nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft ServeQuery, addData fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
+		s.Logger.Error(fmt.Sprintf("haraft ServeQuery fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return fmt.Errorf(fmt.Sprintf("Encode snapshot request: %v", err))
 	}
 
@@ -656,6 +660,6 @@ func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions
 		return fmt.Errorf("haraft ServeQuery fail, code = %d, msg = %s", res.Code, res.Msg)
 	}
 
-	s.Logger.Info(fmt.Sprintf("haraft ServeQuery proxy ok, to leader : %s", leaderAddr))
+	s.Logger.Info(fmt.Sprintf("haraft ServeQuery proxy ok, to leader = %s, query = %s", leaderAddr, qry_log))
 	return nil
 }

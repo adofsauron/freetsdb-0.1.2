@@ -426,7 +426,8 @@ func (h *Handler) ServeQueryHaRaft(qry string, user meta.User, opts query.Execut
 }
 
 func (h *Handler) ServeQueryApply(qry_total string, uid string, opts query.ExecutionOptions) error {
-	h.Logger.Info(fmt.Sprintf("http::ServeQueryApply, uid = %s, query = %s", uid, qry_total))
+	qry_total_log := influxql.Sanitize(qry_total)
+	h.Logger.Info(fmt.Sprintf("http::ServeQueryApply, uid = %s, query = %s", uid, qry_total_log))
 
 	qry_arr := strings.Split(qry_total, ";")
 	for _, qry := range qry_arr {

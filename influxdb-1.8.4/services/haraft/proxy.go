@@ -47,24 +47,27 @@ func (s *Service) ProxyServiceServe() {
 func (s *Service) ProxyServiceHandle(conn net.Conn) {
 	defer conn.Close()
 
-	b, err := io.ReadAll(conn)
-	if nil != err {
-		s.Logger.Error(fmt.Sprintf("ProxyServiceHandle fail, io.ReadFull err = %v", err))
-		return
-	}
+	for {
+		b, err := io.ReadAll(conn)
+		if nil != err {
+			s.Logger.Error(fmt.Sprintf("ProxyServiceHandle fail, io.ReadFull err = %v", err))
+			return
+		}
 
-	byteLen := len(b)
-	if 0 == byteLen {
-		s.Logger.Info(fmt.Sprintf("ProxyServiceHandle ignore, 0 == byteLen"))
-		return
-	}
+		byteLen := len(b)
+		if 0 == byteLen {
+			s.Logger.Info(fmt.Sprintf("ProxyServiceHandle ignore, 0 == byteLen"))
+			return
+		}
 
-	byte_apply := b[1:]
-	s.Logger.Info(fmt.Sprintf("ProxyServiceHandle ready ApplyByte, byteLen = %d", byteLen))
+		byte_apply := b[1:]
+		s.Logger.Info(fmt.Sprintf("ProxyServiceHandle ready ApplyByte, byteLen = %d", byteLen))
 
-	err = s.ProxyServiceProcessByte(byte_apply)
-	if nil != err {
-		s.Logger.Error(fmt.Sprintf("ProxyServiceHandle fail, ProxyServiceProcessByte err = %v", err))
+		err = s.ProxyServiceProcessByte(byte_apply)
+		if nil != err {
+			s.Logger.Error(fmt.Sprintf("ProxyServiceHandle fail, ProxyServiceProcessByte err = %v", err))
+			continue
+		}
 	}
 }
 

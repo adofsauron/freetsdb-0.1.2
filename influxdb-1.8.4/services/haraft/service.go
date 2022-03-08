@@ -177,6 +177,8 @@ func (s *Service) newRaft(ctx context.Context, haRaftDir string, myID string, my
 				s.Logger.Error(fmt.Sprintf(`newRaft fail, create haRaftDir fail, dir = %s, err = %v`, raftDir, err))
 				return nil, nil, fmt.Errorf(`newRaft fail, create haRaftDir fail, dir = %s, err = %v`, raftDir, err)
 			}
+
+			s.Logger.Info(fmt.Sprintf("haraft newRaft, mkdir ok, raftDir = %s", raftDir))
 		}
 	}
 
@@ -187,16 +189,19 @@ func (s *Service) newRaft(ctx context.Context, haRaftDir string, myID string, my
 
 	ldb, err := boltdb.NewBoltStore(filepath.Join(baseDir, "logs.dat"))
 	if nil != err {
+		s.Logger.Error(fmt.Sprintf(`newRaft fail, boltdb.NewBoltStore logs.dat fail, err = %v`, err))
 		return nil, nil, fmt.Errorf(`boltdb.NewBoltStore(%q): %v`, filepath.Join(baseDir, "logs.dat"), err)
 	}
 
 	sdb, err := boltdb.NewBoltStore(filepath.Join(baseDir, "stable.dat"))
 	if nil != err {
+		s.Logger.Error(fmt.Sprintf(`newRaft fail, boltdb.NewBoltStore stable.dat fail, err = %v`, err))
 		return nil, nil, fmt.Errorf(`boltdb.NewBoltStore(%q): %v`, filepath.Join(baseDir, "stable.dat"), err)
 	}
 
 	fss, err := raft.NewFileSnapshotStore(baseDir, 3, os.Stderr)
 	if nil != err {
+		s.Logger.Error(fmt.Sprintf(`newRaft fail, raft.NewFileSnapshotStore fail, err = %v`, err))
 		return nil, nil, fmt.Errorf(`raft.NewFileSnapshotStore(%q, ...): %v`, baseDir, err)
 	}
 
@@ -204,6 +209,7 @@ func (s *Service) newRaft(ctx context.Context, haRaftDir string, myID string, my
 
 	r, err := raft.NewRaft(c, fsm, ldb, sdb, fss, tm.Transport())
 	if nil != err {
+		s.Logger.Error(fmt.Sprintf(`newRaft fail, raft.NewRaft fail, err = %v`, err))
 		return nil, nil, fmt.Errorf("raft.NewRaft: %v", err)
 	}
 
@@ -217,18 +223,22 @@ func (s *Service) newRaft(ctx context.Context, haRaftDir string, myID string, my
 				},
 			},
 		}
+
 		f := r.BootstrapCluster(cfg)
 		if err := f.Error(); nil != err {
+			s.Logger.Error(fmt.Sprintf(`newRaft fail, BootstrapCluster fail, err = %v`, err))
 			return nil, nil, fmt.Errorf("raft.Raft.BootstrapCluster: %v", err)
 		}
 	}
 
+	s.Logger.Info(fmt.Sprintf("haraft newRaft ok, raftBootstrap = %v", raftBootstrap))
 	return r, tm, nil
 }
 
 func (s *Service) Apply(cmd []byte, timeout time.Duration) error {
 	f := s.raft.Apply(cmd, timeout)
 	if err := f.Error(); nil != err {
+		s.Logger.Error(fmt.Sprintf(`Apply fail, raft.Apply fail, err = %v`, err))
 		return rafterrors.MarkRetriable(err)
 	}
 
@@ -489,7 +499,6 @@ func (s *Service) MarshalQuery(qry string, uid string, opts query.ExecutionOptio
 	}
 
 	s.Logger.Debug(fmt.Sprintf("MarshalQuery over index : %d", index))
-
 	return b, nil
 }
 

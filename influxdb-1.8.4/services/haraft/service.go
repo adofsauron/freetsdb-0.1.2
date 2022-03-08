@@ -338,19 +338,19 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 
 	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
 	if nil != err {
-		s.Logger.Error(fmt.Sprintf("ERROR: addData fail, tcp.Dial err, leaderAddr = %s, err = %v \n", leaderAddr, err))
+		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged fail, tcp.Dial err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return err
 	}
 	defer conn.Close()
 
 	if err := json.NewEncoder(conn).Encode(r); nil != err {
-		s.Logger.Error(fmt.Sprintf("ERROR: addData fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
-		return fmt.Errorf(fmt.Sprintf("Encode snapshot request: %v", err))
+		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
+		return fmt.Errorf(fmt.Sprintf("haraft WritePointsPrivileged fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 	}
 
 	res := Reponse{}
 	if err := json.NewDecoder(conn).Decode(&res); nil != err {
-		s.Logger.Error(fmt.Sprintf("ERROR: addData fail, json.NewEncoder.Decode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
+		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged fail, json.NewEncoder.Decode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return err
 	}
 

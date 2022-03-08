@@ -322,6 +322,8 @@ func (s *Service) UnmarshalWrite(b []byte) (string, string, uint64, []models.Poi
 }
 
 func (s *Service) WritePointsPrivileged(database string, retentionPolicy string, consistencyLevel uint64, points []models.Point) error {
+	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged, database = %s, retentionPolicy = %s, consistencyLevel = %d",
+		database, retentionPolicy, consistencyLevel))
 
 	// leader
 
@@ -335,7 +337,8 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 			return err
 		}
 
-		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply ok, database = %s, retentionPolicy = %s", database, retentionPolicy))
+		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply ok, database = %s, retentionPolicy = %s, consistencyLevel = %d",
+			database, retentionPolicy, consistencyLevel))
 		return nil
 	}
 
@@ -371,6 +374,8 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 		return fmt.Errorf(`haraft WritePointsPrivileged response fail, code = %d, msg = %s`, res.Code, res.Msg)
 	}
 
+	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply ok, database = %s, retentionPolicy = %s, consistencyLevel = %d",
+		database, retentionPolicy, consistencyLevel))
 	return nil
 }
 

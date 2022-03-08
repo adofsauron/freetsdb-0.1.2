@@ -148,6 +148,9 @@ type Config struct {
 
 	// ha raft id
 	HaRaftId string `toml:"ha-raft-id"`
+
+	// ha raft proxy port
+	HaRaftProxyPort string `toml:"ha-raft-proxy-port"`
 }
 
 // NewConfig returns the default configuration for tsdb.
@@ -174,7 +177,7 @@ func NewConfig() Config {
 
 		TraceLoggingEnabled: false,
 		TSMWillNeed:         false,
-		HaRaftAddr: 		 DefaultHaRaftAddr,
+		HaRaftAddr:          DefaultHaRaftAddr,
 	}
 }
 
@@ -234,8 +237,9 @@ func (c Config) Diagnostics() (*diagnostics.Diagnostics, error) {
 		"max-concurrent-compactions":         c.MaxConcurrentCompactions,
 		"max-index-log-file-size":            c.MaxIndexLogFileSize,
 		"series-id-set-cache-size":           c.SeriesIDSetCacheSize,
-		"ha-raft-addr":						  c.HaRaftAddr,
-		"ha-raft-dir":						  c.HaRaftDir,
-		"ha-raft-id":						  c.HaRaftId,
+		"ha-raft-addr":                       c.HaRaftAddr,
+		"ha-raft-dir":                        c.HaRaftDir,
+		"ha-raft-id":                         c.HaRaftId,
+		"ha-raft-proxy-port":                 c.HaRaftProxyPort,
 	}), nil
 }

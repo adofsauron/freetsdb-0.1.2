@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -30,6 +31,8 @@ import (
 )
 
 var g_localaddr = ""
+var g_localIp = ""
+var g_proxyPort = ""
 
 const NodeMuxHeader = 9
 const RequestClusterJoin = 1
@@ -63,10 +66,12 @@ type Service struct {
 		Shard(id uint64) *tsdb.Shard
 	}
 
+	Listener      net.Listener
 	Logger        *zap.Logger
 	EngineOptions tsdb.EngineOptions
 
-	raft *raft.Raft
+	raft        *raft.Raft
+	WordTracker *WordTracker
 
 	WritePointsPrivilegedApply WritePointsPrivilegedApply
 	ServeQueryApply            ServeQueryApply
@@ -101,10 +106,19 @@ func (s *Service) serve() {
 	haRaftAddr := s.EngineOptions.Config.HaRaftAddr
 	haRaftDir := s.EngineOptions.Config.HaRaftDir
 	haRaftId := s.EngineOptions.Config.HaRaftId
+	g_proxyPort = s.EngineOptions.Config.HaRaftProxyPort
 
 	s.Logger.Info(fmt.Sprintf("haraft serve haRaftAddr = %s", haRaftAddr))
 	s.Logger.Info(fmt.Sprintf("haraft serve haRaftDir = %s", haRaftDir))
 	s.Logger.Info(fmt.Sprintf("haraft serve haRaftId = %s", haRaftId))
+	s.Logger.Info(fmt.Sprintf("haraft serve haRaftProxyPort = %s", g_proxyPort))
+
+	{
+		addr_arr := strings.Split(haRaftAddr, ":")
+		g_localIp = addr_arr[0]
+
+		s.Logger.Info(fmt.Sprintf("haraft serve local ip = %s", g_localIp))
+	}
 
 	ctx := context.Background()
 	_, port, err := net.SplitHostPort(haRaftAddr)
@@ -118,7 +132,7 @@ func (s *Service) serve() {
 		return
 	}
 
-	wt := &wordTracker{
+	wt := &WordTracker{
 		HaRaftService: s,
 	}
 	r, tm, err := s.newRaft(ctx, haRaftDir, haRaftId, haRaftAddr, wt)
@@ -130,15 +144,18 @@ func (s *Service) serve() {
 	s.raft = r
 	grpcSrv := grpc.NewServer()
 	rpcSrv := &rpcInterface{
-		wordTracker: wt,
+		WordTracker: wt,
 		raft:        r,
 	}
 
+	s.WordTracker = wt
 	pb.RegisterExampleServer(grpcSrv, rpcSrv)
 	tm.Register(grpcSrv)
 	leaderhealth.Setup(r, grpcSrv, []string{"Example"})
 	raftadmin.Register(grpcSrv, r)
 	reflection.Register(grpcSrv)
+
+	go s.ProxyServiceOpen()
 
 	g_localaddr = haRaftAddr
 	if err := grpcSrv.Serve(sock); nil != err {
@@ -362,38 +379,33 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 
 	// follow proxy
 
-	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged proxy, I'am follow, proxy to leader = %s", leaderAddr))
+	leaderAddrArr := strings.Split(leaderAddr, ":")
+	leaderIp := leaderAddrArr[0]
 
-	r := Request{}
-	r.Type = RequestDataServerWrite
-	r.Peers = nil
-	r.Data = b
+	leaderProxyAddr := leaderIp + ":" + g_proxyPort
 
-	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
+	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged proxy, I'am follow, proxy to leader = %s", leaderProxyAddr))
+
+	conn, err := tcp.Dial("tcp", leaderProxyAddr, NodeMuxHeader)
 	if nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged fail, tcp.Dial err, leaderAddr = %s, err = %v \n", leaderAddr, err))
+		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged fail, tcp.Dial err, leaderProxyAddr = %s, err = %v \n", leaderProxyAddr, err))
 		return err
 	}
 	defer conn.Close()
 
-	if err := json.NewEncoder(conn).Encode(r); nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
-		return fmt.Errorf(fmt.Sprintf("haraft WritePointsPrivileged fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
+	writeN := 0
+	{
+		n, err := conn.Write(b)
+		if nil != err {
+			s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged fail, tcp.Dial write err, leaderProxyAddr = %s, err = %v \n", leaderProxyAddr, err))
+			return err
+		}
+
+		writeN = n
 	}
 
-	res := Reponse{}
-	if err := json.NewDecoder(conn).Decode(&res); nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged fail, json.NewEncoder.Decode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
-		return err
-	}
-
-	if 0 != res.Code {
-		s.Logger.Error(fmt.Sprintf(`haraft WritePointsPrivileged response fail, code = %d, msg = %s`, res.Code, res.Msg))
-		return fmt.Errorf(`haraft WritePointsPrivileged response fail, code = %d, msg = %s`, res.Code, res.Msg)
-	}
-
-	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply ok, database = %s, retentionPolicy = %s, consistencyLevel = %d",
-		database, retentionPolicy, consistencyLevel))
+	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply ok, database = %s, retentionPolicy = %s, consistencyLevel = %d, byteLen = %d, writeN = %d",
+		database, retentionPolicy, consistencyLevel, len(b), writeN))
 	return nil
 }
 
@@ -625,6 +637,23 @@ func (s *Service) UnmarshalQuery(b []byte) (string, string, query.ExecutionOptio
 	return qry, uid, opts, nil
 }
 
+func (s *Service) ServeQueryToLeader(b []byte) error {
+	leaderAddr := s.GetLeader()
+	if g_localaddr != leaderAddr {
+		s.Logger.Info(fmt.Sprintf("haraft ServeQueryToLeader fail, myself is not leader, leaderAddr = %s", leaderAddr))
+		return fmt.Errorf(fmt.Sprintf("haraft ServeQueryToLeader fail, myself is not leader, leaderAddr = %s", leaderAddr))
+	}
+
+	err := s.Apply(b, time.Second)
+	if nil != err {
+		s.Logger.Info(fmt.Sprintf("haraft ServeQuery fail, raft.Apply err = %v", err))
+		return err
+	}
+
+	s.Logger.Info(fmt.Sprintf("haraft ServeQuery ok, raft.Apply ok"))
+	return nil
+}
+
 func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions) error {
 	b, err := s.MarshalQuery(qry, uid, opts)
 	if nil != err {
@@ -640,7 +669,7 @@ func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions
 	leaderAddr := s.GetLeader()
 	if g_localaddr == leaderAddr {
 		s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am leader = %s, call raft.Apply on myself", leaderAddr))
-		err := s.Apply(b, time.Second)
+		err := s.ServeQueryToLeader(b)
 		if nil != err {
 			s.Logger.Info(fmt.Sprintf("haraft ServeQuery fail, raft.Apply err = %v", err))
 			return err
@@ -656,7 +685,6 @@ func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions
 
 	r := Request{}
 	r.Type = RequestDataServerQuery
-	r.Peers = nil
 	r.Data = b
 
 	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)

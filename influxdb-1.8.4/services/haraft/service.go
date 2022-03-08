@@ -605,12 +605,11 @@ func (s *Service) UnmarshalQuery(b []byte) (string, string, query.ExecutionOptio
 func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions) error {
 	b, err := s.MarshalQuery(qry, uid, opts)
 	if nil != err {
-		s.Logger.Error(fmt.Sprintf(`haraft ServeQuery fail, MarshalQuery err = %v`, err))
+		s.Logger.Error(fmt.Sprintf(`haraft ServeQuery fail, MarshalQuery err = %v, query = %s`, err, qry))
 		return err
 	}
 
 	qry_log := influxql.Sanitize(qry)
-
 	s.Logger.Info(fmt.Sprintf("haraft ServeQuery, query = %s, uid = %s", qry_log, uid))
 
 	// leader

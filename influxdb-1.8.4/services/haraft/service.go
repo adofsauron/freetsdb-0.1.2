@@ -325,12 +325,13 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged, database = %s, retentionPolicy = %s, consistencyLevel = %d",
 		database, retentionPolicy, consistencyLevel))
 
+	b := s.MarshalWrite(database, retentionPolicy, consistencyLevel, points)
+
 	// leader
 
 	leaderAddr := s.GetLeader()
 	if g_localaddr == leaderAddr {
 		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply, I'am leader = %s", leaderAddr))
-		b := s.MarshalWrite(database, retentionPolicy, consistencyLevel, points)
 		err := s.Apply(b, time.Second)
 		if nil != err {
 			s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged Apply fail, err = %s", leaderAddr))
@@ -349,7 +350,7 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 	r := Request{}
 	r.Type = RequestDataServerWrite
 	r.Peers = nil
-	r.Data = string(s.MarshalWrite(database, retentionPolicy, consistencyLevel, points))
+	r.Data = string(b)
 
 	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
 	if nil != err {

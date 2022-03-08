@@ -45,11 +45,6 @@ func (f *WordTracker) ApplyWritePoint(b []byte) error {
 }
 
 func (f *WordTracker) ApplyQuery(b []byte) error {
-
-	if f.HaRaftService.IstLeader() {
-		return nil
-	}
-
 	qry, uid, opts, err := f.HaRaftService.UnmarshalQuery(b)
 	if nil != err {
 		f.HaRaftService.Logger.Error(fmt.Sprint("ERROR: WordTracker ApplyQuery fail, UnmarshalQuery err = %s", err.Error()))

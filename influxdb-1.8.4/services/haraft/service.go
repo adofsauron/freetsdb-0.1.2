@@ -3,7 +3,6 @@ package haraft
 import (
 	"context"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -38,17 +37,6 @@ const NodeMuxHeader = 9
 const RequestClusterJoin = 1
 const RequestDataServerWrite = 2
 const RequestDataServerQuery = 3
-
-type Request struct {
-	Type  uint64   `json:"Type"`
-	Peers []string `json:"Peers"`
-	Data  []byte   `json:"Data"`
-}
-
-type Reponse struct {
-	Code int    `json:"Code"`
-	Msg  string `json:"Msg"`
-}
 
 const (
 	RFTYPE_WRITEPOINT = 1
@@ -384,7 +372,7 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 
 	leaderProxyAddr := leaderIp + ":" + g_proxyPort
 
-	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged proxy, I'am follow, proxy to leader = %s", leaderProxyAddr))
+	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged proxy, I'am follow, proxy to leaderProxyAddr = %s", leaderProxyAddr))
 
 	conn, err := tcp.Dial("tcp", leaderProxyAddr, NodeMuxHeader)
 	if nil != err {
@@ -681,35 +669,31 @@ func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions
 
 	// follow proxy
 
-	s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am follow, proxy to leader = %s", leaderAddr))
+	leaderAddrArr := strings.Split(leaderAddr, ":")
+	leaderIp := leaderAddrArr[0]
 
-	r := Request{}
-	r.Type = RequestDataServerQuery
-	r.Data = b
+	leaderProxyAddr := leaderIp + ":" + g_proxyPort
 
-	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
+	s.Logger.Info(fmt.Sprintf("haraft ServeQuery, I'am follow, proxy to leaderProxyAddr = %s", leaderProxyAddr))
+
+	conn, err := tcp.Dial("tcp", leaderProxyAddr, NodeMuxHeader)
 	if nil != err {
 		s.Logger.Error(fmt.Sprintf("haraft ServeQuery fail, tcp.Dial err, leaderAddr = %s, err = %v \n", leaderAddr, err))
 		return err
 	}
 	defer conn.Close()
 
-	if err := json.NewEncoder(conn).Encode(r); nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft ServeQuery fail, json.NewEncoder.Encode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
-		return fmt.Errorf(fmt.Sprintf("Encode snapshot request: %v", err))
+	writeN := 0
+	{
+		n, err := conn.Write(b)
+		if nil != err {
+			s.Logger.Error(fmt.Sprintf("haraft ServeQuery fail, tcp.Dial write err, leaderProxyAddr = %s, err = %v \n", leaderProxyAddr, err))
+			return err
+		}
+
+		writeN = n
 	}
 
-	res := Reponse{}
-	if err := json.NewDecoder(conn).Decode(&res); nil != err {
-		s.Logger.Error(fmt.Sprintf("haraft ServeQuery, addData fail, json.NewEncoder.Decode err, leaderAddr = %s, err = %v \n", leaderAddr, err))
-		return err
-	}
-
-	if 0 != res.Code {
-		s.Logger.Error(fmt.Sprintf("haraft ServeQuery fail, code = %d, msg = %s", res.Code, res.Msg))
-		return fmt.Errorf("haraft ServeQuery fail, code = %d, msg = %s", res.Code, res.Msg)
-	}
-
-	s.Logger.Info(fmt.Sprintf("haraft ServeQuery proxy ok, to leader = %s, query = %s", leaderAddr, qry_log))
+	s.Logger.Info(fmt.Sprintf("haraft ServeQuery proxy ok, to leaderProxyAddr = %s, query = %s, writeN = %d", leaderProxyAddr, qry_log, writeN))
 	return nil
 }

@@ -703,7 +703,7 @@ const RequestDataServerQuery = 3
 type Request struct {
 	Type  uint64   `json:"Type"`
 	Peers []string `json:"Peers"`
-	Data  string   `json:"Data"`
+	Data  []byte   `json:"Data"`
 }
 
 type Reponse struct {
@@ -758,35 +758,32 @@ func (s *Server) nodeService() error {
 
 }
 
-func (s *Server) WritePoints(conn net.Conn, data string) {
-	b := []byte(data)
+func (s *Server) WritePoints(conn net.Conn, data []byte) {
+	log.Printf("influxd:WritePoints ready")
+
+	b := data
 
 	res := Reponse{}
-	database, retentionPolicy, consistencyLevel, points, err := s.HaRaftService.UnmarshalWrite(b)
-	if nil != err {
-		res.Code = -1
-		res.Msg = fmt.Sprintf("WritePoints fail, HaRaftService.UnmarshalWrite err = %v", err)
-		goto WWT
-	}
-
-	err = s.HaRaftService.WritePointsPrivileged(database, retentionPolicy, consistencyLevel, points)
-	if nil != err {
-		res.Code = -1
-		res.Msg = fmt.Sprintf("WritePoints fail, HaRaftService.WritePointsPrivileged err = %v", err)
-		goto WWT
-	}
-
 	res.Code = 0
 	res.Msg = "ok"
 
-WWT:
-	if err := json.NewEncoder(conn).Encode(res); err != nil {
-		log.Printf("WritePoints fail, Error writing response", err.Error())
+	err := s.HaRaftService.WritePointsPrivilegedToLeader(b)
+	if nil != err {
+		res.Code = -1
+		res.Msg = fmt.Sprintf("WritePoints fail, HaRaftService.WritePointsPrivilegedToLeader err = %v", err)
 	}
+
+	if err := json.NewEncoder(conn).Encode(res); err != nil {
+		log.Printf("influxd:WritePoints fail, Error writing response", err.Error())
+	}
+
+	log.Printf("influxd:WritePoints ok")
 }
 
-func (s *Server) ExecuteQuery(conn net.Conn, data string) {
-	b := []byte(data)
+func (s *Server) ExecuteQuery(conn net.Conn, data []byte) {
+	log.Printf("influxd:ExecuteQuery ready")
+
+	b := data
 	res := Reponse{}
 	qry, uid, opts, err := s.HaRaftService.UnmarshalQuery(b)
 	if nil != err {
@@ -799,11 +796,15 @@ func (s *Server) ExecuteQuery(conn net.Conn, data string) {
 	if nil != err {
 		res.Code = -1
 		res.Msg = fmt.Sprintf("ExecuteQuery fail, HaRaftService.WritePointsPrivileged err = %v", err)
+
+		log.Printf("influxd:ExecuteQuery fail")
 		goto QWT
 	}
 
 	res.Code = 0
 	res.Msg = "ok"
+
+	log.Printf("influxd:ExecuteQuery ok")
 
 QWT:
 	if err := json.NewEncoder(conn).Encode(res); err != nil {

@@ -39,7 +39,7 @@ const RequestDataServerQuery = 3
 type Request struct {
 	Type  uint64   `json:"Type"`
 	Peers []string `json:"Peers"`
-	Data  string   `json:"Data"`
+	Data  []byte   `json:"Data"`
 }
 
 type Reponse struct {
@@ -321,6 +321,23 @@ func (s *Service) UnmarshalWrite(b []byte) (string, string, uint64, []models.Poi
 	return database, retentionPolicy, consistencyLevel, points, err
 }
 
+func (s *Service) WritePointsPrivilegedToLeader(b []byte) error {
+	leaderAddr := s.GetLeader()
+	if g_localaddr != leaderAddr {
+		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivilegedToLeader fail, myself is not leader, leaderAddr = %s", leaderAddr))
+		return fmt.Errorf(fmt.Sprintf("haraft WritePointsPrivilegedToLeader fail, myself is not leader, leaderAddr = %s", leaderAddr))
+	}
+
+	err := s.Apply(b, time.Second)
+	if nil != err {
+		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivilegedToLeader Apply fail, err = %s", leaderAddr))
+		return err
+	}
+
+	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivilegedToLeader ok, raft.Apply ok"))
+	return nil
+}
+
 func (s *Service) WritePointsPrivileged(database string, retentionPolicy string, consistencyLevel uint64, points []models.Point) error {
 	s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged, database = %s, retentionPolicy = %s, consistencyLevel = %d",
 		database, retentionPolicy, consistencyLevel))
@@ -332,7 +349,7 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 	leaderAddr := s.GetLeader()
 	if g_localaddr == leaderAddr {
 		s.Logger.Info(fmt.Sprintf("haraft WritePointsPrivileged Apply, I'am leader = %s", leaderAddr))
-		err := s.Apply(b, time.Second)
+		err := s.WritePointsPrivilegedToLeader(b)
 		if nil != err {
 			s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivileged Apply fail, err = %s", leaderAddr))
 			return err
@@ -350,7 +367,7 @@ func (s *Service) WritePointsPrivileged(database string, retentionPolicy string,
 	r := Request{}
 	r.Type = RequestDataServerWrite
 	r.Peers = nil
-	r.Data = string(b)
+	r.Data = b
 
 	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
 	if nil != err {
@@ -640,7 +657,7 @@ func (s *Service) ServeQuery(qry string, uid string, opts query.ExecutionOptions
 	r := Request{}
 	r.Type = RequestDataServerQuery
 	r.Peers = nil
-	r.Data = string(b)
+	r.Data = b
 
 	conn, err := tcp.Dial("tcp", leaderAddr, NodeMuxHeader)
 	if nil != err {

@@ -40,14 +40,15 @@ func (f *WordTracker) ApplyWritePoint(b []byte) error {
 		return err
 	}
 
-	f.HaRaftService.Logger.Info(fmt.Sprintf("WordTracker ApplyWritePoint ok, database: %s, consistencyLevel: %d ", database, consistencyLevel))
+	f.HaRaftService.Logger.Info(fmt.Sprintf("WordTracker ApplyWritePoint ok, database = %s, retentionPolicy = %s, consistencyLevel = %d ",
+		database, retentionPolicy, consistencyLevel))
 	return nil
 }
 
 func (f *WordTracker) ApplyQuery(b []byte) error {
 	qry, uid, opts, err := f.HaRaftService.UnmarshalQuery(b)
 	if nil != err {
-		f.HaRaftService.Logger.Error(fmt.Sprint("ERROR: WordTracker ApplyQuery fail, UnmarshalQuery err = %s", err.Error()))
+		f.HaRaftService.Logger.Error(fmt.Sprint("WordTracker ApplyQuery fail, UnmarshalQuery err = %s", err.Error()))
 		return err
 	}
 
@@ -58,7 +59,7 @@ func (f *WordTracker) ApplyQuery(b []byte) error {
 
 	err = f.HaRaftService.ServeQueryApply(qry, uid, opts)
 	if nil != err {
-		f.HaRaftService.Logger.Error(fmt.Sprint("ERROR: WordTracker ApplyQuery fail, ServeQueryApply err = %v, uid:%s", err, uid))
+		f.HaRaftService.Logger.Error(fmt.Sprint("WordTracker ApplyQuery fail, ServeQueryApply err = %v, uid:%s", err, uid))
 		return err
 	}
 

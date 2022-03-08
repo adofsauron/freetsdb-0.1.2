@@ -1,11 +1,11 @@
-ts=2022-03-07T08:49:42.189236Z lvl=info msg="InfluxDB Meta server starting" log_id=0_4tyHBG000 version=1.8.4 branch=1.8 commit=688e697c51fd
-ts=2022-03-07T08:49:42.190426Z lvl=info msg="Go runtime" log_id=0_4tyHBG000 version=go1.17 maxprocs=4
-ts=2022-03-07T08:49:42.200284Z lvl=info msg="Starting meta service" log_id=0_4tyHBG000 service=metaservice
-ts=2022-03-07T08:49:42.200463Z lvl=info msg="Listening on" log_id=0_4tyHBG000 service=metaservice HTTPS=[::]:8091
-[metastore] 2022/03/07 16:49:42 Using data dir: /data/influxdb/meta
-2022-03-07T16:49:42.220+0800 [INFO]  raft-state: bootstrap needed
-2022-03-07T16:49:42.221+0800 [INFO]  raft-state: Node at 192.168.58.128:8089 [Follower]
-2022-03-07T16:49:44.146+0800 [INFO]  raft-state: Node at 192.168.58.128:8089 [Leader]: peers=["192.168.58.128:8089"]
+ts=2022-03-08T09:41:00.637299Z lvl=info msg="InfluxDB Meta server starting" log_id=0_6EIbNG000 version=1.8.4 branch=1.8 commit=688e697c51fd
+ts=2022-03-08T09:41:00.637376Z lvl=info msg="Go runtime" log_id=0_6EIbNG000 version=go1.17 maxprocs=4
+ts=2022-03-08T09:41:00.637874Z lvl=info msg="Starting meta service" log_id=0_6EIbNG000 service=metaservice
+ts=2022-03-08T09:41:00.637905Z lvl=info msg="Listening on" log_id=0_6EIbNG000 service=metaservice HTTPS=[::]:8091
+[metastore] 2022/03/08 17:41:00 Using data dir: /data/influxdb/meta
+2022-03-08T17:41:00.653+0800 [INFO]  raft-state: bootstrap needed
+2022-03-08T17:41:00.654+0800 [INFO]  raft-state: Node at 192.168.58.128:8089 [Follower]
+2022-03-08T17:41:01.983+0800 [INFO]  raft-state: Node at 192.168.58.128:8089 [Leader]: peers=["192.168.58.128:8089"]
 DEBUG: services:meta:CreateMetaNode httpAddr = 192.168.58.128:8091, tcpAddr = 192.168.58.128:8089 ID= 1 
-ts=2022-03-07T08:49:44.223731Z lvl=info msg="Listening for signals" log_id=0_4tyHBG000
+ts=2022-03-08T09:41:02.057475Z lvl=info msg="Listening for signals" log_id=0_6EIbNG000
 DEBUG: services:meta:CreateDataNode host = 192.168.58.128:8086, tcpHost = 192.168.58.128:8088 , ID = 2 

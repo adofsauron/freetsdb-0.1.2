@@ -185,8 +185,6 @@ func (cmd *Command) removeMeta(metaAddr, remoteNodeAddr string) error {
 
 const NodeMuxHeader = 9
 const RequestClusterJoin = 1
-const RequestDataServerWrite = 2
-const RequestDataServerQuery = 3
 
 type Request struct {
 	Type  uint64   `json:"Type"`

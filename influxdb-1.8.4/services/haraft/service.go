@@ -35,8 +35,6 @@ var g_proxyPort = ""
 
 const NodeMuxHeader = 9
 const RequestClusterJoin = 1
-const RequestDataServerWrite = 2
-const RequestDataServerQuery = 3
 
 const (
 	RFTYPE_WRITEPOINT = 1

@@ -697,8 +697,6 @@ func (s *Server) monitorErrorChan(ch <-chan error) {
 }
 
 const RequestClusterJoin = 1
-const RequestDataServerWrite = 2
-const RequestDataServerQuery = 3
 
 type Request struct {
 	Type  uint64   `json:"Type"`
@@ -742,11 +740,6 @@ func (s *Server) nodeService() error {
 			}
 
 			s.joinCluster(conn, r.Peers)
-
-		case RequestDataServerWrite:
-			s.WritePoints(conn, r.Data)
-		case RequestDataServerQuery:
-			s.ExecuteQuery(conn, r.Data)
 		default:
 			log.Printf("request type unknown: %v", r.Type)
 		}
@@ -756,60 +749,6 @@ func (s *Server) nodeService() error {
 
 	return nil
 
-}
-
-func (s *Server) WritePoints(conn net.Conn, data []byte) {
-	log.Printf("influxd:WritePoints ready")
-
-	b := data
-
-	res := Reponse{}
-	res.Code = 0
-	res.Msg = "ok"
-
-	err := s.HaRaftService.WritePointsPrivilegedToLeader(b)
-	if nil != err {
-		res.Code = -1
-		res.Msg = fmt.Sprintf("WritePoints fail, HaRaftService.WritePointsPrivilegedToLeader err = %v", err)
-	}
-
-	if err := json.NewEncoder(conn).Encode(res); err != nil {
-		log.Printf("influxd:WritePoints fail, Error writing response", err.Error())
-	}
-
-	log.Printf("influxd:WritePoints ok")
-}
-
-func (s *Server) ExecuteQuery(conn net.Conn, data []byte) {
-	log.Printf("influxd:ExecuteQuery ready")
-
-	b := data
-	res := Reponse{}
-	qry, uid, opts, err := s.HaRaftService.UnmarshalQuery(b)
-	if nil != err {
-		res.Code = -1
-		res.Msg = fmt.Sprintf("ExecuteQuery fail, HaRaftService.UnmarshalWrite err = %v", err)
-		goto QWT
-	}
-
-	err = s.HaRaftService.ServeQuery(qry, uid, opts)
-	if nil != err {
-		res.Code = -1
-		res.Msg = fmt.Sprintf("ExecuteQuery fail, HaRaftService.WritePointsPrivileged err = %v", err)
-
-		log.Printf("influxd:ExecuteQuery fail")
-		goto QWT
-	}
-
-	res.Code = 0
-	res.Msg = "ok"
-
-	log.Printf("influxd:ExecuteQuery ok")
-
-QWT:
-	if err := json.NewEncoder(conn).Encode(res); err != nil {
-		log.Printf("ExecuteQuery fail, Error writing response", err.Error())
-	}
 }
 
 func (s *Server) joinCluster(conn net.Conn, peers []string) {

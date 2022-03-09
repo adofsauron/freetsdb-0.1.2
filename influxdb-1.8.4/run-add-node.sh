@@ -40,7 +40,11 @@ rm /tmp/* -rf
 
 scp cmd/freetsd/influxd root@192.168.58.131:/tmp
 
-scp cmd/freetsd/influxd root@192.168.58.132:/tmp
+scp cmd/freets/influx root@192.168.58.131:/tmp
+
+scp cmd/freets/influxd root@192.168.58.132:/tmp
+
+scp cmd/freets/influx root@192.168.58.132:/tmp
 
 
 ```
@@ -49,6 +53,9 @@ scp cmd/freetsd/influxd root@192.168.58.132:/tmp
 
 rm /usr/bin/influxd -f
 cp /tmp/influxd /usr/bin
+
+rm /usr/bin/influx -f
+cp /tmp/influx /usr/bin
 
 
 ```

@@ -495,11 +495,31 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 	p := influxql.NewParser(qr)
 	db := r.FormValue("db")
 
-	query_ori_addr := make([]string, len(r.URL.Query()))
+	raft_qry := ""
 	{
 		values := r.URL.Query()
-		for i, q := range values["q"] {
-			query_ori_addr[i] = q
+		for _, q := range values["q"] {
+			if "" == q {
+				continue
+			}
+
+			qry_arr := strings.Fields(q)
+			if 0 >= len(qry_arr) {
+				continue
+			}
+
+			qry_type := qry_arr[0]
+			runHaRaft := true
+			if ("SHOW" == qry_type) ||
+				("show" == qry_type) ||
+				("SELECT" == qry_type) ||
+				("select" == qry_type) {
+				runHaRaft = false
+			}
+
+			if runHaRaft {
+				raft_qry = raft_qry + q + ";"
+			}
 		}
 	}
 
@@ -744,34 +764,12 @@ func (h *Handler) serveQuery(w http.ResponseWriter, r *http.Request, user meta.U
 		}
 	}
 
-	// 关键点在于必须等待本进程处理完, 再向raft日志里写. 好处在于复用了错误处理, TODO:
-	{
-		raft_qry := ""
-		for _, qry := range query_ori_addr {
-			if "" == qry {
-				continue
-			}
-
-			qry_arr := strings.Fields(qry)
-			if 1 < len(qry_arr) {
-				qry_type := string(qry_arr[0])
-
-				runHaRaft := true
-				if ("SHOW" == qry_type) ||
-					("show" == qry_type) ||
-					("SELECT" == qry_type) ||
-					("select" == qry_type) {
-					runHaRaft = false
-				}
-
-				if runHaRaft {
-					raft_qry = raft_qry + qry + ";"
-				}
-			}
-		}
-
-		if "" != raft_qry {
-			go h.ServeQueryHaRaft(raft_qry, user, opts)
+	// 同步向raft日志复制写入, TODO: 出错后如何回滚之前的操作?
+	if "" != raft_qry {
+		err := h.ServeQueryHaRaft(raft_qry, user, opts)
+		if nil != err {
+			h.httpError(rw, "error ServeQueryHaRaft : "+err.Error(), http.StatusMisdirectedRequest)
+			return
 		}
 	}
 

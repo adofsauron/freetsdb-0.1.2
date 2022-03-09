@@ -26,7 +26,6 @@ import (
 	"influxdb.cluster/services/influxql"
 	"influxdb.cluster/tcp"
 	"influxdb.cluster/tsdb"
-
 )
 
 var g_localaddr = ""
@@ -40,6 +39,9 @@ const (
 	RFTYPE_WRITEPOINT = 1
 	RFTYPE_QUERY      = 2
 )
+
+// RAFT apply 超时时间, 秒
+const RAFT_APPLY_TIMEOUT_SEC = time.Duration(5) * time.Second
 
 type WritePointsPrivilegedApply func(database, retentionPolicy string, consistencyLevel uint64, points []models.Point) error
 type ServeQueryApply func(qry string, uid string, opts query.ExecutionOptions) error
@@ -331,7 +333,7 @@ func (s *Service) WritePointsPrivilegedToLeader(b []byte) error {
 		return fmt.Errorf(fmt.Sprintf("haraft WritePointsPrivilegedToLeader fail, myself is not leader, leaderAddr = %s", leaderAddr))
 	}
 
-	err := s.Apply(b, time.Second)
+	err := s.Apply(b, RAFT_APPLY_TIMEOUT_SEC)
 	if nil != err {
 		s.Logger.Error(fmt.Sprintf("haraft WritePointsPrivilegedToLeader Apply fail, err = %s", leaderAddr))
 		return err
@@ -630,7 +632,7 @@ func (s *Service) ServeQueryToLeader(b []byte) error {
 		return fmt.Errorf(fmt.Sprintf("haraft ServeQueryToLeader fail, myself is not leader, leaderAddr = %s", leaderAddr))
 	}
 
-	err := s.Apply(b, time.Second)
+	err := s.Apply(b, RAFT_APPLY_TIMEOUT_SEC)
 	if nil != err {
 		s.Logger.Info(fmt.Sprintf("haraft ServeQuery fail, raft.Apply err = %v", err))
 		return err

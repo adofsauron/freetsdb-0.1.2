@@ -11,9 +11,10 @@ import (
 	"sync/atomic"
 	"time"
 
+	"go.uber.org/zap"
 	"influxdb.cluster/models"
 	"influxdb.cluster/services/influxql"
-	"go.uber.org/zap"
+
 )
 
 var (
@@ -232,6 +233,12 @@ func (e *Executor) WithLogger(log *zap.Logger) {
 func (e *Executor) ExecuteQuery(query *influxql.Query, opt ExecutionOptions, closing chan struct{}) <-chan *Result {
 	results := make(chan *Result)
 	go e.executeQuery(query, opt, closing, results)
+	return results
+}
+
+func (e *Executor) ExecuteQueryNoCTX(query *influxql.Query, opt ExecutionOptions, closing chan struct{}) <-chan *Result {
+	results := make(chan *Result)
+	e.executeQuery(query, opt, closing, results)
 	return results
 }
 

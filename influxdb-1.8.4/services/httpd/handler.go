@@ -442,7 +442,8 @@ func (h *Handler) ServeQueryApply(qry_total string, uid string, opts query.Execu
 			return err
 		}
 
-		results := h.QueryExecutor.ExecuteQuery(q, opts, nil)
+		// 必须是同步处理, 不能创建新协程
+		results := h.QueryExecutor.ExecuteQueryNoCTX(q, opts, nil)
 
 		qry_log := influxql.Sanitize(qry)
 		h.Logger.Info(fmt.Sprintf("httpd::ServeQueryApply, results = %v, qry = %s", results, qry_log))

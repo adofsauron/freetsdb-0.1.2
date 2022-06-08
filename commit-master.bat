@@ -1,4 +1,8 @@
 
+git config --global core.autocrlf false
+
+git pull
+
 git add .
 
 git commit -m "fix master"

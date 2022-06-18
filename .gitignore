@@ -4,3 +4,5 @@ freetsdb-0.1.2/.idea/
 freetsdb-0.1.2/.vscode/
 influxdb-1.8.4/.idea/
 influxdb-1.8.4/.vscode/
+vendor/
+
